@@ -1,172 +1,130 @@
-<div *ngIf="activeSearchTab" (click)="activeSearchTab = null" class="fixed inset-0 bg-black/40 z-30 transition-opacity"></div>
+<div class="min-h-screen bg-[#121212] font-sans">
+  
+  <ng-container *ngIf="activeView !== 'admin'">
+    <div *ngIf="activeSearchTab" (click)="activeSearchTab = null" class="fixed inset-0 bg-black/40 z-30 transition-opacity"></div>
 
-<div class="min-h-screen flex flex-col bg-[#121212]">
-  <header class="sticky top-0 z-40 bg-[#1A1A1A] border-b border-[#333333] h-[80px] flex items-center">
-    <div class="max-w-7xl mx-auto px-6 w-full flex items-center justify-between relative">
-      
-      <button (click)="handleBackToCatalog()" class="flex items-center gap-2 text-xl font-bold text-white hover:text-[#0055FF] transition-colors relative z-50 flex-shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#0055FF]"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span class="hidden lg:block tracking-tight">Smart Host</span>
-      </button>
+    <header class="sticky top-0 z-40 bg-[#1A1A1A] border-b border-[#333333] h-[80px] flex items-center">
+      <div class="max-w-7xl mx-auto px-6 w-full flex items-center justify-between relative">
+        <button (click)="handleBackToCatalog()" class="flex items-center gap-2 text-xl font-bold text-white hover:text-[#0055FF] transition-colors relative z-50 flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#0055FF]"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="hidden lg:block tracking-tight">Smart Host</span>
+        </button>
 
-      <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-[450px] lg:max-w-[600px] z-40 hidden md:block">
-        <div class="bg-[#1E1E1E] border border-[#333333] rounded-full shadow-md flex items-center h-12 lg:h-14 transition-all duration-300" [ngClass]="{'bg-[#2a2a2a] scale-105': activeSearchTab}">
-          
-          <button (click)="openSearchTab('destino')" class="flex-1 flex flex-col justify-center px-4 lg:px-6 h-full rounded-full transition-all hover:bg-[#333333]" [ngClass]="{'bg-[#333333] shadow-lg': activeSearchTab === 'destino'}">
-            <span class="text-[9px] lg:text-[10px] font-bold text-white tracking-wider uppercase">Dónde</span>
-            <span class="text-xs lg:text-sm truncate" [ngClass]="selectedDestino ? 'text-white font-medium' : 'text-[#a0a0a0]'">{{ selectedDestino || 'Explora destinos' }}</span>
-          </button>
-          <div class="h-6 lg:h-8 w-[1px] bg-[#333333]" *ngIf="activeSearchTab !== 'destino' && activeSearchTab !== 'fechas'"></div>
-
-          <button (click)="openSearchTab('fechas')" class="flex-1 flex flex-col justify-center px-3 lg:px-4 h-full rounded-full transition-all hover:bg-[#333333]" [ngClass]="{'bg-[#333333] shadow-lg': activeSearchTab === 'fechas'}">
-            <span class="text-[9px] lg:text-[10px] font-bold text-white tracking-wider uppercase">Llegada</span>
-            <span class="text-xs lg:text-sm truncate" [ngClass]="selDateIn ? 'text-white font-medium' : 'text-[#a0a0a0]'">{{ formatDateShort(selDateIn) }}</span>
-          </button>
-          <div class="h-6 lg:h-8 w-[1px] bg-[#333333]" *ngIf="activeSearchTab !== 'fechas'"></div>
-
-          <button (click)="openSearchTab('fechas')" class="flex-1 flex flex-col justify-center px-3 lg:px-4 h-full rounded-full transition-all hover:bg-[#333333]" [ngClass]="{'bg-[#333333] shadow-lg': activeSearchTab === 'fechas'}">
-            <span class="text-[9px] lg:text-[10px] font-bold text-white tracking-wider uppercase">Salida</span>
-            <span class="text-xs lg:text-sm truncate" [ngClass]="selDateOut ? 'text-white font-medium' : 'text-[#a0a0a0]'">{{ formatDateShort(selDateOut) }}</span>
-          </button>
-          <div class="h-6 lg:h-8 w-[1px] bg-[#333333]" *ngIf="activeSearchTab !== 'fechas' && activeSearchTab !== 'huespedes'"></div>
-
-          <div class="flex-[1.2] flex items-center justify-between h-full rounded-full transition-all hover:bg-[#333333] pl-4 pr-1 lg:pr-1.5" [ngClass]="{'bg-[#333333] shadow-lg': activeSearchTab === 'huespedes'}">
-            <div class="flex flex-col justify-center h-full cursor-pointer flex-1" (click)="openSearchTab('huespedes')">
-              <span class="text-[9px] lg:text-[10px] font-bold text-white tracking-wider uppercase">Quién</span>
-              <span class="text-xs lg:text-sm truncate" [ngClass]="adults + children > 0 ? 'text-white font-medium' : 'text-[#a0a0a0]'">{{ adults + children > 0 ? (adults + children) + ' huéspedes' : '¿Cuántos?' }}</span>
-            </div>
-            
-            <button (click)="triggerSearch()" class="h-10 w-10 lg:h-11 lg:w-11 rounded-full bg-[#0055FF] hover:bg-[#0044CC] flex items-center justify-center transition-colors flex-shrink-0 mr-0.5">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-[450px] lg:max-w-[600px] z-40 hidden md:block">
+          <div class="bg-[#1E1E1E] border border-[#333333] rounded-full shadow-md flex items-center h-12 lg:h-14 transition-all duration-300" [ngClass]="{'bg-[#2a2a2a] scale-105': activeSearchTab}">
+            <button (click)="openSearchTab('destino')" class="flex-1 flex flex-col justify-center px-4 lg:px-6 h-full rounded-full transition-all hover:bg-[#333333]" [ngClass]="{'bg-[#333333] shadow-lg': activeSearchTab === 'destino'}">
+              <span class="text-[9px] lg:text-[10px] font-bold text-white tracking-wider uppercase">Dónde</span>
+              <span class="text-xs lg:text-sm truncate" [ngClass]="selectedDestino ? 'text-white font-medium' : 'text-[#a0a0a0]'">{{ selectedDestino || 'Explora destinos' }}</span>
             </button>
+            <div class="h-6 lg:h-8 w-[1px] bg-[#333333]" *ngIf="activeSearchTab !== 'destino' && activeSearchTab !== 'fechas'"></div>
+
+            <button (click)="openSearchTab('fechas')" class="flex-[1.5] flex flex-col justify-center px-3 lg:px-4 h-full rounded-full transition-all hover:bg-[#333333]" [ngClass]="{'bg-[#333333] shadow-lg': activeSearchTab === 'fechas'}">
+              <span class="text-[9px] lg:text-[10px] font-bold text-white tracking-wider uppercase">Fechas</span>
+              <span class="text-xs lg:text-sm truncate" [ngClass]="selDateIn ? 'text-white font-medium' : 'text-[#a0a0a0]'">{{ formattedSearchDates }}</span>
+            </button>
+            <div class="h-6 lg:h-8 w-[1px] bg-[#333333]" *ngIf="activeSearchTab !== 'fechas' && activeSearchTab !== 'huespedes'"></div>
+
+            <div class="flex-[1.2] flex items-center justify-between h-full rounded-full transition-all hover:bg-[#333333] pl-4 pr-1 lg:pr-1.5" [ngClass]="{'bg-[#333333] shadow-lg': activeSearchTab === 'huespedes'}">
+              <div class="flex flex-col justify-center h-full cursor-pointer flex-1" (click)="openSearchTab('huespedes')">
+                <span class="text-[9px] lg:text-[10px] font-bold text-white tracking-wider uppercase">Quién</span>
+                <span class="text-xs lg:text-sm truncate" [ngClass]="adults + children > 0 ? 'text-white font-medium' : 'text-[#a0a0a0]'">{{ adults + children > 0 ? (adults + children) + ' huéspedes' : '¿Cuántos?' }}</span>
+              </div>
+              <button (click)="triggerSearch()" class="h-10 w-10 lg:h-11 lg:w-11 rounded-full bg-[#0055FF] hover:bg-[#0044CC] flex items-center justify-center transition-colors flex-shrink-0 mr-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="activeSearchTab === 'destino'" class="absolute top-[65px] lg:top-[75px] left-0 w-[350px] bg-[#1E1E1E] border border-[#333333] rounded-3xl shadow-2xl z-50 p-4 max-h-[60vh] overflow-y-auto">
+            <div *ngFor="let dest of destinations" class="mb-4">
+              <p class="px-4 py-2 text-xs font-bold text-[#a0a0a0] tracking-wider uppercase">{{ dest.city }}</p>
+              <button *ngFor="let neighborhood of dest.neighborhoods" (click)="handleSelectDestino(neighborhood + ', Quito')" class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#2a2a2a] rounded-xl transition-colors">
+                <div class="w-10 h-10 rounded-lg bg-[#333333] flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                <span class="text-white">{{ neighborhood }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="activeSearchTab === 'fechas'" class="absolute top-[65px] lg:top-[75px] left-1/2 -translate-x-1/2 w-[650px] bg-[#1E1E1E] border border-[#333333] rounded-3xl shadow-2xl z-50 p-6">
+            <div class="flex items-start gap-6 relative px-4 mt-2">
+              <button (click)="prevMonth()" class="absolute left-0 top-0 p-1.5 rounded-full hover:bg-[#333333] text-[#a0a0a0] hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+              <div class="flex-1">
+                <h3 class="text-center text-white font-medium mb-4 text-sm">{{ month1Title }}</h3>
+                <div class="grid grid-cols-7 gap-y-1 text-center place-items-center">
+                  <div *ngFor="let day of dayNames" class="text-[10px] font-bold text-[#a0a0a0] mb-1 w-8">{{ day }}</div>
+                  <ng-container *ngFor="let d of month1Days">
+                    <div *ngIf="!d" class="w-8 h-8"></div>
+                    <div *ngIf="d" (click)="selectDate(d)" class="w-8 h-8 flex items-center justify-center text-xs cursor-pointer transition-all" [ngClass]="{'bg-white text-black font-bold rounded-full': isDateSelected(d), 'bg-[#2a2a2a] text-white': isDateInRange(d), 'text-white hover:border border-white rounded-full': !isDateSelected(d) && !isDateInRange(d)}">{{ d.getDate() }}</div>
+                  </ng-container>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-center text-white font-medium mb-4 text-sm">{{ month2Title }}</h3>
+                <div class="grid grid-cols-7 gap-y-1 text-center place-items-center">
+                  <div *ngFor="let day of dayNames" class="text-[10px] font-bold text-[#a0a0a0] mb-1 w-8">{{ day }}</div>
+                  <ng-container *ngFor="let d of month2Days">
+                    <div *ngIf="!d" class="w-8 h-8"></div>
+                    <div *ngIf="d" (click)="selectDate(d)" class="w-8 h-8 flex items-center justify-center text-xs cursor-pointer transition-all" [ngClass]="{'bg-white text-black font-bold rounded-full': isDateSelected(d), 'bg-[#2a2a2a] text-white': isDateInRange(d), 'text-white hover:border border-white rounded-full': !isDateSelected(d) && !isDateInRange(d)}">{{ d.getDate() }}</div>
+                  </ng-container>
+                </div>
+              </div>
+              <button (click)="nextMonth()" class="absolute right-0 top-0 p-1.5 rounded-full hover:bg-[#333333] text-[#a0a0a0] hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+            </div>
+            <div class="flex items-center justify-between mt-6 pt-4 border-t border-[#333333]">
+              <button (click)="clearSearchDates()" class="text-xs font-semibold text-white hover:underline underline-offset-2 px-3 py-1.5 rounded-lg hover:bg-[#2a2a2a]">Borrar fechas</button>
+              <button (click)="activeSearchTab = null" class="px-5 py-1.5 bg-white text-black text-xs font-bold rounded-lg hover:bg-gray-200">Aplicar</button>
+            </div>
+          </div>
+
+          <div *ngIf="activeSearchTab === 'huespedes'" class="absolute top-[65px] lg:top-[75px] right-0 w-[380px] bg-[#1E1E1E] border border-[#333333] rounded-3xl shadow-2xl z-50 p-6">
+            <div class="flex items-center justify-between py-4 border-b border-[#333333]">
+              <div><p class="text-white font-medium text-lg">Adultos</p><p class="text-sm text-[#a0a0a0]">De 13 años o más</p></div>
+              <div class="flex items-center gap-4">
+                <button (click)="updateAdults(-1, $event)" class="w-8 h-8 rounded-full border border-[#666] flex items-center justify-center text-[#a0a0a0] hover:border-white hover:text-white" [disabled]="adults <= 1" [class.opacity-30]="adults <= 1">-</button>
+                <span class="text-white w-4 text-center font-medium">{{ adults }}</span>
+                <button (click)="updateAdults(1, $event)" class="w-8 h-8 rounded-full border border-[#666] flex items-center justify-center text-[#a0a0a0] hover:border-white hover:text-white">+</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-4">
+              <div><p class="text-white font-medium text-lg">Niños</p><p class="text-sm text-[#a0a0a0]">De 2 a 12 años</p></div>
+              <div class="flex items-center gap-4">
+                <button (click)="updateChildren(-1, $event)" class="w-8 h-8 rounded-full border border-[#666] flex items-center justify-center text-[#a0a0a0] hover:border-white hover:text-white" [disabled]="children <= 0" [class.opacity-30]="children <= 0">-</button>
+                <span class="text-white w-4 text-center font-medium">{{ children }}</span>
+                <button (click)="updateChildren(1, $event)" class="w-8 h-8 rounded-full border border-[#666] flex items-center justify-center text-[#a0a0a0] hover:border-white hover:text-white">+</button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div *ngIf="activeSearchTab === 'destino'" class="absolute top-[65px] lg:top-[75px] left-0 w-[350px] bg-[#1E1E1E] border border-[#333333] rounded-3xl shadow-2xl z-50 p-4 max-h-[60vh] overflow-y-auto">
-          <div *ngFor="let dest of destinations" class="mb-4">
-            <p class="px-4 py-2 text-xs font-bold text-[#a0a0a0] tracking-wider uppercase">{{ dest.city }}</p>
-            <button *ngFor="let neighborhood of dest.neighborhoods" (click)="handleSelectDestino(neighborhood + ', Quito')" class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#2a2a2a] rounded-xl transition-colors">
-              <div class="w-10 h-10 rounded-lg bg-[#333333] flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              </div>
-              <span class="text-white">{{ neighborhood }}</span>
+        <div class="flex items-center gap-4 relative z-50 flex-shrink-0">
+          <div *ngIf="!isLoggedIn">
+            <button (click)="openAuthModal('login')" class="px-5 py-2.5 border border-[#333333] text-white rounded-full hover:border-white transition-all font-medium text-sm">Iniciar Sesión</button>
+          </div>
+          <div *ngIf="isLoggedIn" class="flex items-center gap-3 lg:gap-4 relative">
+            <button (click)="goToAdminPanel()" class="hidden lg:flex items-center gap-2 text-sm font-semibold text-white bg-[#1a1a1a] border border-[#444] hover:border-[#0055FF] px-4 py-2 rounded-full transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#0055FF]"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Modo Anfitrión
             </button>
-          </div>
-          <button *ngIf="selectedDestino" (click)="selectedDestino = ''; activeSearchTab = null" class="w-full px-4 py-3 text-center text-[#ff4444] hover:bg-[#2a2a2a] rounded-xl transition-colors mt-2 border-t border-[#333333]">
-            Limpiar destino
-          </button>
-        </div>
-
-        <div *ngIf="activeSearchTab === 'fechas'" class="absolute top-[65px] lg:top-[75px] left-1/2 -translate-x-1/2 w-[650px] bg-[#1E1E1E] border border-[#333333] rounded-3xl shadow-2xl z-50 p-6">
-          <div class="flex items-start gap-6 relative px-4 mt-2">
-            <button (click)="prevMonth()" class="absolute left-0 top-0 p-1.5 rounded-full hover:bg-[#333333] text-[#a0a0a0] hover:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-
-            <div class="flex-1">
-              <h3 class="text-center text-white font-medium mb-4 text-sm">{{ month1Title }}</h3>
-              <div class="grid grid-cols-7 gap-y-1 text-center place-items-center">
-                <div *ngFor="let day of dayNames" class="text-[10px] font-bold text-[#a0a0a0] mb-1 w-8">{{ day }}</div>
-                <ng-container *ngFor="let d of month1Days">
-                  <div *ngIf="!d" class="w-8 h-8"></div>
-                  <div *ngIf="d" (click)="selectDate(d)" class="w-8 h-8 flex items-center justify-center text-xs cursor-pointer transition-all"
-                       [ngClass]="{'bg-white text-black font-bold rounded-full': isDateSelected(d), 'bg-[#2a2a2a] text-white': isDateInRange(d), 'text-white hover:border border-white rounded-full': !isDateSelected(d) && !isDateInRange(d)}">
-                    {{ d.getDate() }}
-                  </div>
-                </ng-container>
-              </div>
+            <div (click)="isUserMenuOpen = !isUserMenuOpen" class="flex items-center gap-2 cursor-pointer hover:bg-[#2a2a2a] p-1.5 pr-3 lg:pr-4 rounded-full border border-[#333333] transition-colors select-none bg-[#1E1E1E]">
+              <div class="w-8 h-8 rounded-full bg-[#0055FF] flex items-center justify-center text-white font-bold text-sm">{{ userName.charAt(0).toUpperCase() }}</div>
+              <span class="text-white font-medium text-sm hidden sm:block">{{ userName }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#a0a0a0]"><path d="m6 9 6 6 6-6"/></svg>
             </div>
-
-            <div class="flex-1">
-              <h3 class="text-center text-white font-medium mb-4 text-sm">{{ month2Title }}</h3>
-              <div class="grid grid-cols-7 gap-y-1 text-center place-items-center">
-                <div *ngFor="let day of dayNames" class="text-[10px] font-bold text-[#a0a0a0] mb-1 w-8">{{ day }}</div>
-                <ng-container *ngFor="let d of month2Days">
-                  <div *ngIf="!d" class="w-8 h-8"></div>
-                  <div *ngIf="d" (click)="selectDate(d)" class="w-8 h-8 flex items-center justify-center text-xs cursor-pointer transition-all"
-                       [ngClass]="{'bg-white text-black font-bold rounded-full': isDateSelected(d), 'bg-[#2a2a2a] text-white': isDateInRange(d), 'text-white hover:border border-white rounded-full': !isDateSelected(d) && !isDateInRange(d)}">
-                    {{ d.getDate() }}
-                  </div>
-                </ng-container>
-              </div>
-            </div>
-
-            <button (click)="nextMonth()" class="absolute right-0 top-0 p-1.5 rounded-full hover:bg-[#333333] text-[#a0a0a0] hover:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-          </div>
-
-          <div class="flex items-center justify-between mt-6 pt-4 border-t border-[#333333]">
-            <button (click)="clearSearchDates()" class="text-xs font-semibold text-white hover:underline underline-offset-2 transition-all px-3 py-1.5 rounded-lg hover:bg-[#2a2a2a]">Borrar fechas</button>
-            <button (click)="activeSearchTab = null" class="px-5 py-1.5 bg-white text-black text-xs font-bold rounded-lg hover:bg-gray-200 transition-colors">Aplicar</button>
-          </div>
-        </div>
-
-        <div *ngIf="activeSearchTab === 'huespedes'" class="absolute top-[65px] lg:top-[75px] right-0 w-[380px] bg-[#1E1E1E] border border-[#333333] rounded-3xl shadow-2xl z-50 p-6">
-          <div class="flex items-center justify-between py-4 border-b border-[#333333]">
-            <div>
-              <p class="text-white font-medium text-lg">Adultos</p>
-              <p class="text-sm text-[#a0a0a0]">De 13 años o más</p>
-            </div>
-            <div class="flex items-center gap-4">
-              <button (click)="updateAdults(-1, $event)" class="w-8 h-8 rounded-full border border-[#666] flex items-center justify-center text-[#a0a0a0] hover:border-white hover:text-white transition-colors" [disabled]="adults <= 1" [class.opacity-30]="adults <= 1">-</button>
-              <span class="text-white w-4 text-center font-medium">{{ adults }}</span>
-              <button (click)="updateAdults(1, $event)" class="w-8 h-8 rounded-full border border-[#666] flex items-center justify-center text-[#a0a0a0] hover:border-white hover:text-white transition-colors">+</button>
-            </div>
-          </div>
-          <div class="flex items-center justify-between py-4">
-            <div>
-              <p class="text-white font-medium text-lg">Niños</p>
-              <p class="text-sm text-[#a0a0a0]">De 2 a 12 años</p>
-            </div>
-            <div class="flex items-center gap-4">
-              <button (click)="updateChildren(-1, $event)" class="w-8 h-8 rounded-full border border-[#666] flex items-center justify-center text-[#a0a0a0] hover:border-white hover:text-white transition-colors" [disabled]="children <= 0" [class.opacity-30]="children <= 0">-</button>
-              <span class="text-white w-4 text-center font-medium">{{ children }}</span>
-              <button (click)="updateChildren(1, $event)" class="w-8 h-8 rounded-full border border-[#666] flex items-center justify-center text-[#a0a0a0] hover:border-white hover:text-white transition-colors">+</button>
+            <div *ngIf="isUserMenuOpen" class="absolute top-full right-0 mt-3 w-56 bg-[#1E1E1E] border border-[#333333] rounded-2xl shadow-2xl z-50 overflow-hidden py-2">
+              <button (click)="showWipToast()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors">Mis viajes</button>
+              <button (click)="showWipToast()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors">Favoritos</button>
+              <hr class="border-[#333333] my-1">
+              <button (click)="goToAdminPanel()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] lg:hidden transition-colors">Modo Anfitrión</button>
+              <button (click)="showWipToast()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors">Configuración de cuenta</button>
+              <hr class="border-[#333333] my-1">
+              <button (click)="logout()" class="w-full text-left px-5 py-3 text-sm text-[#ff4444] hover:bg-[#2a2a2a] transition-colors">Cerrar sesión</button>
             </div>
           </div>
         </div>
       </div>
+    </header>
 
-      <div class="flex items-center gap-4 relative z-50 flex-shrink-0">
-        <div *ngIf="!isLoggedIn">
-          <button (click)="openAuthModal('login')" class="px-5 py-2.5 border border-[#333333] text-white rounded-full hover:border-white transition-all font-medium text-sm">
-            Iniciar Sesión
-          </button>
-        </div>
-        
-        <div *ngIf="isLoggedIn" class="flex items-center gap-3 lg:gap-4 relative">
-          <button (click)="goToAdminPanel()" class="hidden lg:flex items-center gap-2 text-sm font-semibold text-white bg-[#1a1a1a] border border-[#444] hover:border-[#0055FF] px-4 py-2 rounded-full transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#0055FF]"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            Modo Anfitrión
-          </button>
-
-          <div (click)="isUserMenuOpen = !isUserMenuOpen" class="flex items-center gap-2 cursor-pointer hover:bg-[#2a2a2a] p-1.5 pr-3 lg:pr-4 rounded-full border border-[#333333] transition-colors select-none bg-[#1E1E1E]">
-            <div class="w-8 h-8 rounded-full bg-[#0055FF] flex items-center justify-center text-white font-bold text-sm">
-              {{ userName.charAt(0).toUpperCase() }}
-            </div>
-            <span class="text-white font-medium text-sm hidden sm:block">{{ userName }}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#a0a0a0]"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-
-          <div *ngIf="isUserMenuOpen" class="absolute top-full right-0 mt-3 w-56 bg-[#1E1E1E] border border-[#333333] rounded-2xl shadow-2xl z-50 overflow-hidden py-2">
-            <button (click)="showWipToast()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] font-medium transition-colors">Mis viajes</button>
-            <button (click)="showWipToast()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] font-medium transition-colors">Favoritos</button>
-            <hr class="border-[#333333] my-1">
-            <button (click)="goToAdminPanel()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] lg:hidden transition-colors">Modo Anfitrión</button>
-            <button (click)="showWipToast()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors">Configuración de cuenta</button>
-            <hr class="border-[#333333] my-1">
-            <button (click)="logout()" class="w-full text-left px-5 py-3 text-sm text-[#ff4444] hover:bg-[#2a2a2a] transition-colors">Cerrar sesión</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </header>
-
-  <main class="flex-1 relative z-10">
-    <ng-container *ngIf="activeView !== 'admin'">
-      <div *ngIf="activeView === 'catalogo'" class="max-w-7xl mx-auto px-6 py-6">
+    <main class="flex-1 relative z-10">
+      <div *ngIf="activeView === 'catalogo'" class="max-w-7xl mx-auto px-6 py-6 animate-in fade-in duration-300">
         <div class="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide border-b border-[#333333]">
           <div class="flex gap-3">
             <button *ngFor="let filter of filterOptions" (click)="activeFilter = filter" [ngClass]="{'bg-[#0055FF] text-white': activeFilter === filter, 'bg-transparent text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': activeFilter !== filter}" class="px-5 py-2.5 rounded-full whitespace-nowrap transition-colors font-medium border border-[#333333]">
@@ -174,25 +132,21 @@
             </button>
           </div>
           <button (click)="isFiltrosOpen = true" class="flex items-center gap-2 px-5 py-2.5 bg-transparent text-white rounded-full border border-[#333333] hover:border-white transition-colors font-medium whitespace-nowrap ml-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="1" y2="7"/><line x1="8" x2="8" y1="9" y2="15"/><line x1="16" x2="16" y1="17" y2="23"/></svg>
-            Filtros adicionales
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="1" y2="7"/><line x1="8" x2="8" y1="9" y2="15"/><line x1="16" x2="16" y1="17" y2="23"/></svg> Filtros
           </button>
         </div>
 
-        <div *ngIf="filteredProperties.length === 0" class="flex flex-col items-center justify-center py-24 px-4 text-center">
-          <div class="w-20 h-20 rounded-full bg-[#1E1E1E] border border-[#333333] flex items-center justify-center mb-6 shadow-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </div>
-          <h3 class="text-2xl font-bold text-white mb-2">No encontramos coincidencias exactas</h3>
-          <p class="text-[#a0a0a0] max-w-md mb-8">Intenta ajustar tu búsqueda cambiando o eliminando algunas fechas o filtros para ver más resultados.</p>
-          <button (click)="clearAllFilters()" class="px-8 py-3.5 bg-white text-black hover:bg-gray-200 rounded-lg font-bold transition-colors">
-            Quitar todos los filtros
-          </button>
+        <div *ngIf="filteredProperties.length === 0 && !isFiltrosOpen" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 mt-8">
+            <div *ngFor="let i of [1,2,3,4,5,6]" class="animate-pulse">
+                <div class="bg-[#1E1E1E] aspect-[20/19] rounded-xl mb-3"></div>
+                <div class="h-4 bg-[#1E1E1E] w-3/4 rounded mb-2"></div>
+                <div class="h-4 bg-[#1E1E1E] w-1/2 rounded"></div>
+            </div>
         </div>
 
         <div *ngIf="filteredProperties.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 mt-8">
-          <div *ngFor="let property of filteredProperties" class="group cursor-pointer" (click)="handlePropertyClick(property)">
-            <div class="relative aspect-[20/19] rounded-xl overflow-hidden mb-3">
+          <div *ngFor="let property of filteredProperties" class="group cursor-pointer transition-all duration-300 hover:-translate-y-2" (click)="handlePropertyClick(property)">
+            <div class="relative aspect-[20/19] rounded-xl overflow-hidden mb-3 shadow-lg group-hover:shadow-[0_0_20px_rgba(0,85,255,0.2)] transition-shadow">
               <img [src]="property.image" [alt]="property.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <button (click)="toggleFavorite($event, property.id)" class="absolute top-4 right-4 p-2 rounded-full hover:scale-110 transition-transform z-10">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="{'fill-[#ff385c] stroke-[#ff385c]': favorites.includes(property.id), 'fill-black/30 stroke-white': !favorites.includes(property.id)}"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
@@ -208,171 +162,409 @@
               </div>
               <p class="text-[#a0a0a0] text-[15px] mt-0.5 truncate">{{ property.name }}</p>
               <p class="text-[#a0a0a0] text-[15px]">{{ formattedSearchDates !== 'Agregar fechas' ? formattedSearchDates : 'Fechas de viaje' }}</p>
-              <p class="mt-1.5 text-[15px]">
-                <span class="font-bold text-white">${{ property.price }}</span>
-                <span class="text-[#a0a0a0] font-normal"> noche</span>
-              </p>
+              <p class="mt-1.5 text-[15px]"><span class="font-bold text-white">${{ property.price }}</span><span class="text-[#a0a0a0] font-normal"> noche</span></p>
             </div>
           </div>
         </div>
       </div>
 
-      <div *ngIf="activeView === 'detalle' && selectedProperty" class="max-w-7xl mx-auto px-6 py-6">
-        <button (click)="handleBackToCatalog()" class="flex items-center gap-2 text-[#a0a0a0] hover:text-white transition-colors mb-6 font-medium">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-          <span>Volver a las opciones</span>
-        </button>
-
+      <div *ngIf="activeView === 'detalle' && selectedProperty" class="max-w-7xl mx-auto px-6 py-6 animate-in slide-in-from-right-4 duration-300">
+        <nav class="flex items-center gap-2 text-sm text-[#a0a0a0] mb-6">
+            <span class="hover:text-white cursor-pointer" (click)="handleBackToCatalog()">Inicio</span><span>/</span>
+            <span class="hover:text-white cursor-pointer">{{ selectedProperty.location.split(',')[0] }}</span><span>/</span>
+            <span class="text-white font-medium">{{ selectedProperty.name }}</span>
+        </nav>
         <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-2 rounded-2xl overflow-hidden mb-10">
-          <div class="h-[450px]">
-            <img [src]="selectedProperty.images[0]" [alt]="selectedProperty.name" class="w-full h-full object-cover hover:opacity-95 transition-opacity" />
-          </div>
+          <div class="h-[450px]"><img [src]="selectedProperty.images[0]" [alt]="selectedProperty.name" class="w-full h-full object-cover" /></div>
           <div class="grid grid-rows-2 gap-2 h-[450px]">
-            <img [src]="selectedProperty.images[1]" [alt]="selectedProperty.name" class="w-full h-full object-cover hover:opacity-95 transition-opacity" />
-            <img [src]="selectedProperty.images[2]" [alt]="selectedProperty.name" class="w-full h-full object-cover hover:opacity-95 transition-opacity" />
+            <img [src]="selectedProperty.images[1]" [alt]="selectedProperty.name" class="w-full h-full object-cover" />
+            <img [src]="selectedProperty.images[2]" [alt]="selectedProperty.name" class="w-full h-full object-cover" />
           </div>
         </div>
-
         <div class="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12">
           <div>
             <h1 class="text-3xl font-bold text-white mb-2">{{ selectedProperty.name }}</h1>
             <p class="text-lg text-white font-medium mb-4">{{ selectedProperty.location }}</p>
-            
             <div class="flex flex-wrap items-center gap-4 text-[15px] text-white border-b border-[#333333] pb-6">
-              <span>{{ selectedProperty.capacity }} huéspedes</span>
-              <span>·</span>
+              <span>{{ selectedProperty.capacity }} huéspedes</span><span>·</span>
               <div class="flex items-center gap-1 font-bold">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>{{ selectedProperty.rating }}</span>
-                <span class="font-normal underline underline-offset-2 ml-1 cursor-pointer">{{ selectedProperty.reviews }} evaluaciones</span>
+                <span>{{ selectedProperty.rating }}</span><span class="font-normal underline ml-1">{{ selectedProperty.reviews }} evaluaciones</span>
               </div>
             </div>
-
             <div class="py-8 border-b border-[#333333]">
-              <h2 class="text-2xl font-bold text-white mb-6">¿Qué hay en este alojamiento?</h2>
-              <div class="grid grid-cols-2 gap-y-4 gap-x-2">
-                <div *ngFor="let amenity of selectedProperty.amenities" class="flex items-center gap-4">
-                  <span class="text-white">
-                    <svg *ngIf="amenity === 'WiFi'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                    <svg *ngIf="amenity === 'Mascotas'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>
-                    <svg *ngIf="amenity === 'Cocina'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 21.8 6.4-6.3"/><path d="m19 5-7 7"/></svg>
-                    <svg *ngIf="amenity === 'Estacionamiento'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-                    <svg *ngIf="amenity === 'TV'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                    <svg *ngIf="amenity === 'Aire acondicionado'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M3 18h18"/><path d="M3 6h18"/></svg>
-                    <svg *ngIf="amenity === 'Piscina'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6 0 1.2.4 1.8 1.1A4.2 4.2 0 0 0 6.6 8c1.3 0 2-.9 2.8-2 .7-1.1 1.5-2 2.8-2s2.1.9 2.8 2c.8 1.1 1.5 2 2.8 2 1.3 0 2-.9 2.8-2 .7-1.1 1.5-2 2.8-2s2.1.9 2.8 2c.8 1.1 1.5 2 2.8 2s2-.9 2.8-2"/><path d="M2 12c.6 0 1.2.4 1.8 1.1A4.2 4.2 0 0 0 6.6 14c1.3 0 2-.9 2.8-2 .7-1.1 1.5-2 2.8-2s2.1.9 2.8 2c.8 1.1 1.5 2 2.8 2 1.3 0 2-.9 2.8-2 .7-1.1 1.5-2 2.8-2s2.1.9 2.8 2c.8 1.1 1.5 2 2.8 2s2-.9 2.8-2"/><path d="M2 18c.6 0 1.2.4 1.8 1.1A4.2 4.2 0 0 0 6.6 20c1.3 0 2-.9 2.8-2 .7-1.1 1.5-2 2.8-2s2.1.9 2.8 2c.8 1.1 1.5 2 2.8 2 1.3 0 2-.9 2.8-2 .7-1.1 1.5-2 2.8-2s2.1.9 2.8 2c.8 1.1 1.5 2 2.8 2s2-.9 2.8-2"/></svg>
-                    <svg *ngIf="amenity === 'Jacuzzi'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="7" y1="19" x2="7" y2="21"/><line x1="17" y1="19" x2="17" y2="21"/></svg>
-                  </span>
-                  <span class="text-white text-[15px]">{{ amenity }}</span>
-                </div>
+              <h2 class="text-2xl font-bold text-white mb-6">Servicios</h2>
+              <div class="grid grid-cols-2 gap-y-4">
+                <div *ngFor="let amenity of selectedProperty.amenities" class="flex items-center gap-4 text-white text-[15px]">{{ amenity }}</div>
               </div>
             </div>
-
             <div class="py-8 border-b border-[#333333]">
               <h2 class="text-2xl font-bold text-white mb-4">Acerca de este espacio</h2>
               <p class="text-[#a0a0a0] leading-relaxed text-[16px] whitespace-pre-line">{{ selectedProperty.description }}</p>
             </div>
-
-            <button (click)="isContactModalOpen = true" class="mt-8 flex items-center gap-2 px-6 py-3 bg-[#2a2a2a] border border-[#333333] text-white rounded-lg hover:bg-[#333333] transition-colors font-medium">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
-              <span>Contactar al Anfitrión</span>
-            </button>
+            <button (click)="isContactModalOpen = true" class="mt-8 flex items-center gap-2 px-6 py-3 bg-[#2a2a2a] border border-[#333333] text-white rounded-lg hover:bg-[#333333] font-medium">Contactar al Anfitrión</button>
           </div>
-
           <div class="lg:sticky lg:top-32 h-fit">
             <div class="bg-[#1E1E1E] rounded-2xl p-6 border border-[#333333] shadow-2xl">
-              <div class="flex items-baseline gap-1 mb-6">
-                <span class="text-2xl font-bold text-white">${{ selectedProperty.price }}</span>
-                <span class="text-[#a0a0a0] text-[15px]"> noche</span>
-              </div>
-
+              <div class="flex items-baseline gap-1 mb-6"><span class="text-2xl font-bold text-white">${{ selectedProperty.price }}</span><span class="text-[#a0a0a0] text-[15px]"> noche</span></div>
               <div class="border border-[#a0a0a0] rounded-xl overflow-hidden mb-4 grid grid-cols-2 relative">
                 <div class="p-3 border-r border-[#a0a0a0] relative overflow-hidden group">
-                  <label class="text-[10px] font-bold text-white block mb-0.5 tracking-wider uppercase pointer-events-none">LLEGADA</label>
-                  <div class="text-[14px] text-[#a0a0a0] pointer-events-none group-hover:text-white transition-colors" [ngClass]="{'text-white': resDateIn}">{{ formatIsoDate(resDateIn) }}</div>
-                  <input [type]="resInputTypeIn" (focus)="resInputTypeIn = 'date'" (blur)="!resDateIn ? resInputTypeIn = 'text' : null" [(ngModel)]="resDateIn" style="color-scheme: dark;" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                  <label class="text-[10px] font-bold text-white block mb-0.5 tracking-wider uppercase">LLEGADA</label>
+                  <div class="text-[14px] text-[#a0a0a0]">{{ formatIsoDate(resDateIn) }}</div>
+                  <input [type]="resInputTypeIn" (focus)="resInputTypeIn = 'date'" (blur)="!resDateIn ? resInputTypeIn = 'text' : null" [(ngModel)]="resDateIn" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                 </div>
                 <div class="p-3 relative overflow-hidden group">
-                  <label class="text-[10px] font-bold text-white block mb-0.5 tracking-wider uppercase pointer-events-none">SALIDA</label>
-                  <div class="text-[14px] text-[#a0a0a0] pointer-events-none group-hover:text-white transition-colors" [ngClass]="{'text-white': resDateOut}">{{ formatIsoDate(resDateOut) }}</div>
-                  <input [type]="resInputTypeOut" (focus)="resInputTypeOut = 'date'" (blur)="!resDateOut ? resInputTypeOut = 'text' : null" [(ngModel)]="resDateOut" style="color-scheme: dark;" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                  <label class="text-[10px] font-bold text-white block mb-0.5 tracking-wider uppercase">SALIDA</label>
+                  <div class="text-[14px] text-[#a0a0a0]">{{ formatIsoDate(resDateOut) }}</div>
+                  <input [type]="resInputTypeOut" (focus)="resInputTypeOut = 'date'" (blur)="!resDateOut ? resInputTypeOut = 'text' : null" [(ngModel)]="resDateOut" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                 </div>
               </div>
-
-              <button (click)="handleReservation()" class="w-full py-3.5 bg-gradient-to-r from-[#e61e4d] to-[#d70466] hover:from-[#d70466] hover:to-[#d70466] text-white font-bold text-lg rounded-xl transition-all mb-4">
-                Reservar
-              </button>
-              <p class="text-center text-[#a0a0a0] text-sm mb-6">Aún no se hará ningún cargo</p>
-
+              <button (click)="handleReservation()" class="w-full py-3.5 bg-gradient-to-r from-[#e61e4d] to-[#d70466] text-white font-bold text-lg rounded-xl mb-4">Reservar</button>
               <div class="space-y-4 mb-6 text-[16px]">
-                <div class="flex justify-between text-[#a0a0a0]">
-                  <span class="underline underline-offset-2">${{ selectedProperty.price }} x {{ dynamicNights }} noches</span>
-                  <span class="text-white">${{ subtotal }}</span>
-                </div>
-                <div class="flex justify-between text-[#a0a0a0]">
-                  <span class="underline underline-offset-2">Tarifa de servicio de Smart Host</span>
-                  <span class="text-white">${{ serviceFee }}</span>
-                </div>
+                <div class="flex justify-between text-[#a0a0a0]"><span class="underline">${{ selectedProperty.price }} x {{ dynamicNights }} noches</span><span class="text-white">${{ subtotal }}</span></div>
+                <div class="flex justify-between text-[#a0a0a0]"><span class="underline">Tarifa de servicio</span><span class="text-white">${{ serviceFee }}</span></div>
               </div>
-              <div class="border-t border-[#333333] pt-5 flex justify-between font-bold text-white text-[16px]">
-                <span>Total antes de impuestos</span>
-                <span>${{ total }}</span>
-              </div>
+              <div class="border-t border-[#333333] pt-5 flex justify-between font-bold text-white text-[16px]"><span>Total antes de impuestos</span><span>${{ total }}</span></div>
             </div>
           </div>
         </div>
       </div>
-    </ng-container>
+    </main>
 
-    <div *ngIf="activeView === 'admin'" class="flex flex-col items-center justify-center py-32 px-6 animate-in fade-in duration-500">
-      <div class="w-16 h-16 border-4 border-[#0055FF] border-t-transparent rounded-full animate-spin mb-6"></div>
-      <h2 class="text-2xl font-bold text-white mb-2">Preparando el panel de administrador</h2>
-      <p class="text-[#a0a0a0]">Aquí insertaremos el nuevo componente...</p>
-    </div>
-  </main>
+    <footer class="border-t border-[#333333] py-8 mt-12 bg-[#121212]">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <p class="text-[#a0a0a0] text-sm">Smart Host v1.0 © 2026. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+  </ng-container>
 
-  <footer class="border-t border-[#333333] py-8 mt-12 bg-[#121212]">
-    <div class="max-w-7xl mx-auto px-6 text-center">
-      <p class="text-[#a0a0a0] text-sm">
-        Smart Host v1.0 © 2026. Todos los derechos reservados.
-      </p>
-    </div>
-  </footer>
+  <div *ngIf="activeView === 'admin'" class="min-h-screen flex w-full bg-[#121212] animate-in fade-in duration-500">
+    
+    <aside class="w-64 bg-[#1A1A1A] border-r border-[#333333] flex flex-col h-screen sticky top-0" [ngClass]="{'hidden lg:flex': !isAdminSidebarOpen}">
+      <div class="h-20 flex items-center px-6 border-b border-[#333333]">
+        <div class="flex items-center gap-3 text-white font-bold text-xl tracking-tight">
+          <div class="bg-[#0055FF] text-white rounded-lg p-1.5 text-sm">SH</div>
+          Smart Host
+        </div>
+      </div>
+      
+      <nav class="flex-1 px-4 py-6 space-y-2">
+        <button (click)="setAdminView('inicio')" [ngClass]="{'bg-[#0055FF] text-white': adminView === 'inicio', 'text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': adminView !== 'inicio'}" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Inicio
+        </button>
+        <button (click)="setAdminView('propiedades')" [ngClass]="{'bg-[#0055FF] text-white': adminView === 'propiedades', 'text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': adminView !== 'propiedades'}" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
+          Mis Propiedades
+        </button>
+        <button (click)="setAdminView('calendario')" [ngClass]="{'bg-[#0055FF] text-white': adminView === 'calendario', 'text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': adminView !== 'calendario'}" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          Calendario
+        </button>
+        <button (click)="setAdminView('mensajes')" [ngClass]="{'bg-[#0055FF] text-white': adminView === 'mensajes', 'text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': adminView !== 'mensajes'}" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+          Mensajes
+        </button>
+      </nav>
 
-  <div *ngIf="isFiltrosOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div class="p-4 border-t border-[#333333]">
+        <button (click)="exitAdminPanel()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#2a2a2a] hover:bg-[#333333] text-white rounded-xl font-medium transition-colors text-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/><path d="M21 12H9"/></svg>
+          Salir de Anfitrión
+        </button>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0">
+      
+      <header class="h-20 bg-[#1A1A1A] border-b border-[#333333] flex items-center justify-between px-8 sticky top-0 z-20">
+        <div class="flex items-center gap-4">
+          <button (click)="isAdminSidebarOpen = !isAdminSidebarOpen" class="lg:hidden text-white hover:bg-[#2a2a2a] p-2 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          </button>
+          <h1 class="text-xl font-bold text-white">{{ adminViewTitle }}</h1>
+        </div>
+        
+        <div class="flex items-center gap-6">
+          <div class="relative hidden md:block">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-[#a0a0a0]"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" placeholder="Buscar reservas o propiedades..." class="bg-[#121212] border border-[#333333] text-white text-sm rounded-lg pl-10 pr-4 py-2 w-[300px] outline-none focus:border-[#0055FF] transition-colors">
+          </div>
+          <button (click)="showWipToast()" class="bg-[#0055FF] hover:bg-[#0044CC] text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 shadow-lg shadow-blue-900/20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+            Nueva Propiedad
+          </button>
+          <button (click)="showToast('Tienes 5 notificaciones nuevas')" class="relative text-[#a0a0a0] hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#e61e4d] rounded-full border-2 border-[#1A1A1A]"></span>
+          </button>
+        </div>
+      </header>
+
+      <div class="p-8 overflow-y-auto">
+        
+        <div *ngIf="adminView === 'inicio'" class="space-y-8 animate-in fade-in">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl">
+              <div class="w-10 h-10 rounded-xl bg-[#1a2b4c] flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4dabf7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Ocupación de Hoy</p><h3 class="text-3xl font-bold text-white mb-4">92%</h3>
+              <button class="text-[#0055FF] text-sm font-semibold hover:underline">Ver detalles</button>
+            </div>
+            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl">
+              <div class="w-10 h-10 rounded-xl bg-[#1a2b4c] flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4dabf7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg></div>
+              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Reservas del Mes</p><h3 class="text-3xl font-bold text-white mb-4">15</h3>
+              <button class="text-[#0055FF] text-sm font-semibold hover:underline">Ver detalles</button>
+            </div>
+            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl">
+              <div class="w-10 h-10 rounded-xl bg-[#33251a] flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fcc419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></div>
+              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Limpiezas Pendientes</p><h3 class="text-3xl font-bold text-white mb-4">3</h3>
+              <button class="text-[#0055FF] text-sm font-semibold hover:underline">Ver detalles</button>
+            </div>
+            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl">
+              <div class="w-10 h-10 rounded-xl bg-[#2b1a33] flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b197fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Mensajes Nuevos</p><h3 class="text-3xl font-bold text-white mb-4">5</h3>
+              <button class="text-[#0055FF] text-sm font-semibold hover:underline">Ver detalles</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
+            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl">
+              <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0055FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <h3 class="text-lg font-bold text-white">Check-ins / Check-outs de Hoy</h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead><tr class="border-b border-[#333333] text-[#a0a0a0] text-sm"><th class="pb-3 font-medium">Hora</th><th class="pb-3 font-medium">Huésped</th><th class="pb-3 font-medium">Inmueble</th><th class="pb-3 font-medium">Estado</th><th class="pb-3 font-medium text-right">Acción</th></tr></thead>
+                  <tbody class="text-sm">
+                    <tr class="border-b border-[#333333]"><td class="py-4 text-white">11:00 AM</td><td class="py-4 text-white">Carlos M.</td><td class="py-4 text-[#a0a0a0]">Loft La Carolina</td><td class="py-4"><span class="bg-red-500/10 text-red-400 px-3 py-1 rounded-full text-xs font-semibold">Check-out</span></td><td class="py-4 text-right"><button class="text-[#0055FF] hover:underline font-medium">Ver reserva</button></td></tr>
+                    <tr><td class="py-4 text-white">15:00 PM</td><td class="py-4 text-white">Familia Gómez</td><td class="py-4 text-[#a0a0a0]">Casa Centro Histórico</td><td class="py-4"><span class="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-xs font-semibold">Check-in</span></td><td class="py-4 text-right"><button class="text-[#0055FF] hover:underline font-medium">Ver reserva</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl">
+              <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fcc419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                <h3 class="text-lg font-bold text-white">Tareas de Limpieza</h3>
+              </div>
+              <div class="space-y-4">
+                <label class="flex items-start gap-4 p-3 bg-[#121212] rounded-xl border border-[#333333] cursor-pointer hover:border-[#666] transition-colors"><input type="checkbox" class="mt-1 w-4 h-4 rounded bg-[#1A1A1A] border-[#666] checked:bg-[#0055FF]"><div><p class="text-white text-sm font-medium">Suite Ejecutiva - Limpieza profunda</p><p class="text-[#a0a0a0] text-xs mt-1">Asignado a: María</p></div></label>
+                <label class="flex items-start gap-4 p-3 bg-[#121212] rounded-xl border border-[#333333] cursor-pointer hover:border-[#666] transition-colors"><input type="checkbox" class="mt-1 w-4 h-4 rounded bg-[#1A1A1A] border-[#666] checked:bg-[#0055FF]"><div><p class="text-white text-sm font-medium">Loft La Carolina - Reposición sábanas</p><p class="text-[#a0a0a0] text-xs mt-1">Asignado a: Juan</p></div></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="adminView === 'calendario'" class="space-y-6 animate-in fade-in">
+          <div class="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-6">
+            <div class="space-y-4">
+              <div class="flex flex-wrap items-center gap-6 p-4 bg-[#1A1A1A] border border-[#333333] rounded-xl">
+                <div class="flex items-center gap-2"><div class="w-4 h-4 rounded bg-emerald-500/20 border border-emerald-500/50"></div><span class="text-sm text-[#a0a0a0]">Libre</span></div>
+                <div class="flex items-center gap-2"><div class="w-4 h-4 rounded bg-rose-500/20 border border-rose-500/50"></div><span class="text-sm text-[#a0a0a0]">Ocupado</span></div>
+                <div class="flex items-center gap-2"><div class="w-4 h-4 rounded bg-[#0055FF] border border-[#0055FF]"></div><span class="text-sm text-[#a0a0a0]">Seleccionado</span></div>
+              </div>
+              <div class="bg-[#1A1A1A] border border-[#333333] rounded-xl p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-6">
+                  <button (click)="adminMesAnterior()" class="p-2 hover:bg-[#2a2a2a] rounded-lg transition-colors text-[#a0a0a0] hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+                  <h3 class="text-lg font-bold text-white capitalize">{{ adminNombreMes }}</h3>
+                  <button (click)="adminMesSiguiente()" class="p-2 hover:bg-[#2a2a2a] rounded-lg transition-colors text-[#a0a0a0] hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+                </div>
+                <div class="grid grid-cols-7 gap-2 mb-4">
+                  <div *ngFor="let dia of adminDiasSemana" class="text-center text-sm font-bold text-[#a0a0a0] py-2">{{ dia }}</div>
+                </div>
+                <div class="grid grid-cols-7 gap-2">
+                  <div *ngFor="let _ of adminEmptyDays" class="aspect-square"></div>
+                  <button *ngFor="let dia of adminDaysArray" (click)="adminToggleDia(dia)" [disabled]="adminPropiedadSeleccionada.diasOcupados.includes(dia)" class="aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all" [ngClass]="{'bg-rose-500/20 text-rose-400 cursor-not-allowed': adminPropiedadSeleccionada.diasOcupados.includes(dia), 'bg-[#0055FF] text-white shadow-lg shadow-blue-900/20': !adminPropiedadSeleccionada.diasOcupados.includes(dia) && adminDiasSeleccionados.includes(dia), 'bg-[#2a2a2a] text-white hover:bg-emerald-500/20 hover:text-emerald-400': !adminPropiedadSeleccionada.diasOcupados.includes(dia) && !adminDiasSeleccionados.includes(dia)}">
+                    {{ dia }}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div class="bg-[#1A1A1A] border border-[#333333] rounded-xl p-6 shadow-xl">
+                <label class="block text-[11px] font-bold text-[#a0a0a0] mb-2 uppercase tracking-wider">Seleccionar Propiedad</label>
+                <select (change)="adminHandlePropiedadChange($event)" [value]="adminPropiedadSeleccionadaId" class="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-white font-medium focus:outline-none focus:border-[#0055FF] transition-colors">
+                  <option *ngFor="let prop of propiedadesCalendario" [value]="prop.id">{{ prop.nombre }}</option>
+                </select>
+              </div>
+              <div class="bg-[#1A1A1A] border border-[#333333] rounded-xl p-6 shadow-xl">
+                <p class="text-[11px] font-bold text-[#a0a0a0] mb-2 uppercase tracking-wider">Días seleccionados</p>
+                <p class="text-4xl font-bold text-white">{{ adminDiasSeleccionados.length }}</p>
+              </div>
+              <button (click)="adminBloquearFechas()" class="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-[#0055FF] text-white rounded-xl font-bold hover:bg-[#0044CC] transition-colors shadow-lg shadow-blue-900/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Confirmar Bloqueo
+              </button>
+              <div class="bg-[#1A1A1A] border border-[#333333] rounded-xl p-6 shadow-xl space-y-4">
+                <h4 class="font-bold text-white text-lg border-b border-[#333333] pb-3">Estadísticas</h4>
+                <div class="space-y-3 pt-1">
+                  <div class="flex justify-between items-center"><span class="text-sm text-[#a0a0a0]">Días ocupados</span><span class="text-sm font-bold text-white bg-[#2a2a2a] px-2.5 py-1 rounded-md">{{ adminPropiedadSeleccionada.diasOcupados.length }}</span></div>
+                  <div class="flex justify-between items-center"><span class="text-sm text-[#a0a0a0]">Ocupación mensual</span><span class="text-sm font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md">{{ adminOcupacionPorcentaje }}%</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="adminView === 'propiedades'" class="space-y-6 animate-in fade-in">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <p class="text-[#a0a0a0]">{{ adminPropiedadesFiltradas.length }} propiedades encontradas</p>
+            <select [(ngModel)]="adminPropiedadesFiltro" class="px-4 py-2 bg-[#121212] border border-[#333333] rounded-lg text-white focus:outline-none focus:border-[#0055FF] transition-colors">
+              <option value="Todos">Todos los estados</option>
+              <option value="Libre">Libre</option>
+              <option value="Ocupado">Ocupado</option>
+              <option value="Mantenimiento">En Mantenimiento</option>
+            </select>
+          </div>
+          <div *ngIf="adminPropiedadesFiltradas.length === 0" class="flex flex-col items-center justify-center py-20 bg-[#1A1A1A] border border-[#333333] rounded-xl shadow-xl">
+            <div class="p-4 bg-[#2a2a2a] rounded-full mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">No se encontraron propiedades</h3>
+            <p class="text-[#a0a0a0] text-sm text-center max-w-sm">No hay propiedades con el estado seleccionado. Intenta con otro filtro.</p>
+          </div>
+          <div *ngIf="adminPropiedadesFiltradas.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let propiedad of adminPropiedadesFiltradas" class="bg-[#1A1A1A] border border-[#333333] rounded-xl overflow-hidden hover:border-[#0055FF]/50 transition-all duration-300 group shadow-xl">
+              <div class="relative h-48 overflow-hidden">
+                <img [src]="propiedad.imagen" [alt]="propiedad.nombre" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div class="absolute top-3 right-3">
+                  <span class="px-3 py-1 rounded-full text-xs font-bold shadow-md"
+                        [ngClass]="{
+                          'bg-emerald-500 text-white shadow-emerald-500/30': propiedad.estado === 'Libre',
+                          'bg-rose-500 text-white shadow-rose-500/30': propiedad.estado === 'Ocupado',
+                          'bg-amber-500 text-white shadow-amber-500/30': propiedad.estado === 'Mantenimiento'
+                        }">
+                    {{ propiedad.estado }}
+                  </span>
+                </div>
+              </div>
+              <div class="p-4">
+                <h3 class="text-lg font-bold text-white mb-1">{{ propiedad.nombre }}</h3>
+                <p class="text-sm text-[#a0a0a0] mb-4">{{ propiedad.precio }}</p>
+                <button (click)="showWipToast()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2a2a2a] text-white rounded-lg font-medium hover:bg-[#0055FF] hover:text-white transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Administrar Inmueble
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="adminView === 'mensajes'" class="flex flex-col h-[calc(100vh-180px)] animate-in fade-in">
+          <div class="flex gap-2 p-1 bg-[#1A1A1A] border border-[#333333] rounded-lg w-fit mb-4 flex-shrink-0 shadow-lg">
+            <button (click)="adminMensajesTab = 'chats'" [ngClass]="{'bg-[#0055FF] text-white shadow-md': adminMensajesTab === 'chats', 'text-[#a0a0a0] hover:text-white hover:bg-[#2a2a2a]': adminMensajesTab !== 'chats'}" class="px-5 py-2 rounded-md text-sm font-bold transition-all">
+              Chats
+            </button>
+            <button (click)="adminMensajesTab = 'resenas'" [ngClass]="{'bg-[#0055FF] text-white shadow-md': adminMensajesTab === 'resenas', 'text-[#a0a0a0] hover:text-white hover:bg-[#2a2a2a]': adminMensajesTab !== 'resenas'}" class="px-5 py-2 rounded-md text-sm font-bold transition-all">
+              Reseñas
+            </button>
+          </div>
+
+          <div *ngIf="adminMensajesTab === 'chats'" class="flex-1 bg-[#1A1A1A] border border-[#333333] rounded-xl overflow-hidden flex flex-col lg:flex-row min-h-0 shadow-xl">
+            <div class="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-[#333333] flex flex-col lg:h-full">
+              <div class="p-4 border-b border-[#333333] flex-shrink-0">
+                <div class="relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-[#a0a0a0]"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input type="text" [(ngModel)]="adminMensajesBusqueda" placeholder="Buscar contacto..." class="w-full pl-10 pr-4 py-2.5 bg-[#121212] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#0055FF] transition-colors text-sm">
+                </div>
+              </div>
+              <div class="flex-1 overflow-y-auto min-h-0 max-h-40 lg:max-h-none scrollbar-hide">
+                <button *ngFor="let contacto of adminContactosFiltrados" (click)="adminSeleccionarContacto(contacto)" [ngClass]="{'bg-[#2a2a2a]': adminContactoActivo.id === contacto.id}" class="w-full p-4 flex items-start gap-3 hover:bg-[#2a2a2a]/50 transition-colors text-left border-b border-[#333333]/50 last:border-0">
+                  <div class="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                    <img [src]="contacto.imagen" [alt]="contacto.propiedad" class="w-full h-full object-cover">
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="font-bold text-white text-sm truncate">{{ contacto.nombre }}</span>
+                      <span class="text-[10px] text-[#a0a0a0]">{{ contacto.tiempo }}</span>
+                    </div>
+                    <p class="text-xs text-[#0055FF] font-medium mb-1">{{ contacto.propiedad }}</p>
+                    <p class="text-xs text-[#a0a0a0] truncate">{{ contacto.ultimo }}</p>
+                  </div>
+                  <span *ngIf="contacto.noLeidos > 0" class="w-5 h-5 bg-[#0055FF] rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow-lg shadow-blue-900/20">{{ contacto.noLeidos }}</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex-1 flex flex-col min-h-0 bg-[#121212]">
+              <div class="p-4 border-b border-[#333333] flex items-center gap-4 flex-shrink-0 bg-[#1A1A1A]">
+                <div class="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                  <img [src]="adminContactoActivo.imagen" [alt]="adminContactoActivo.propiedad" class="w-full h-full object-cover">
+                </div>
+                <div>
+                  <h3 class="font-bold text-white">{{ adminContactoActivo.nombre }}</h3>
+                  <p class="text-sm text-[#0055FF] font-medium">{{ adminContactoActivo.propiedad }}</p>
+                  <p class="text-xs text-[#a0a0a0] mt-0.5">{{ adminContactoActivo.fechas }}</p>
+                </div>
+              </div>
+
+              <div class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+                <div *ngFor="let msg of adminMensajesChat" class="flex" [ngClass]="msg.enviado ? 'justify-end' : 'justify-start'">
+                  <div class="max-w-[75%] px-5 py-3 rounded-2xl shadow-md" [ngClass]="msg.enviado ? 'bg-[#0055FF] text-white rounded-br-sm' : 'bg-[#2a2a2a] text-white rounded-bl-sm border border-[#333333]'">
+                    <p class="text-[15px] leading-relaxed">{{ msg.texto }}</p>
+                    <p class="text-[10px] mt-1.5" [ngClass]="msg.enviado ? 'text-white/70 text-right' : 'text-[#a0a0a0]'">{{ msg.hora }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-4 border-t border-[#333333] flex-shrink-0 bg-[#1A1A1A]">
+                <div class="flex gap-3">
+                  <input type="text" [(ngModel)]="adminMensajeInput" (keydown.enter)="adminEnviarMensaje()" placeholder="Escribe un mensaje..." class="flex-1 px-5 py-3.5 bg-[#121212] border border-[#333333] rounded-xl text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#0055FF] transition-colors text-sm">
+                  <button (click)="adminEnviarMensaje()" class="px-6 py-3.5 bg-[#0055FF] text-white rounded-xl font-bold hover:bg-[#0044CC] transition-colors flex items-center gap-2 shadow-lg shadow-blue-900/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                    <span class="hidden sm:inline">Enviar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="adminMensajesTab === 'resenas'" class="flex-1 overflow-y-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div *ngFor="let resena of adminResenas" class="bg-[#1A1A1A] border border-[#333333] rounded-xl p-6 shadow-xl">
+                <div class="flex items-start justify-between mb-4">
+                  <div>
+                    <h4 class="font-bold text-white">{{ resena.nombre }}</h4>
+                    <p class="text-sm text-[#0055FF] font-medium">{{ resena.propiedad }}</p>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <svg *ngFor="let i of [1,2,3,4,5]" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="i <= resena.rating ? 'text-amber-400 fill-amber-400' : 'text-[#333333] fill-[#333333]'">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                  </div>
+                </div>
+                <p class="text-[#a0a0a0] text-[15px] mb-4 leading-relaxed">"{{ resena.texto }}"</p>
+                <p class="text-xs text-[#666] font-medium">{{ resena.fecha }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div *ngIf="isFiltrosOpen" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
     <div class="bg-[#1E1E1E] border border-[#333333] rounded-2xl w-full max-w-2xl mx-4 flex flex-col max-h-[85vh]">
       <div class="flex items-center justify-between p-6 border-b border-[#333333]">
-        <button (click)="isFiltrosOpen = false" class="p-2 hover:bg-[#2a2a2a] rounded-full transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
-        <h2 class="text-lg font-bold text-white">Filtros</h2>
-        <div class="w-9"></div>
+        <button (click)="isFiltrosOpen = false" class="p-2 hover:bg-[#2a2a2a] rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        <h2 class="text-lg font-bold text-white">Filtros</h2><div class="w-9"></div>
       </div>
-
       <div class="p-6 overflow-y-auto flex-1 space-y-8">
         <div>
           <h3 class="text-white font-bold text-xl mb-4">Rango de precios</h3>
-          <p class="text-[#a0a0a0] mb-6">El precio promedio por noche es de $80</p>
           <div class="flex items-center gap-4">
             <div class="flex-1 relative border border-[#666] rounded-xl focus-within:border-white transition-colors p-2">
               <label class="text-[10px] text-[#a0a0a0] block uppercase tracking-wider font-bold">Mínimo</label>
-              <div class="flex items-center">
-                <span class="text-white mr-1">$</span>
-                <input type="number" [(ngModel)]="priceMin" class="w-full bg-transparent text-white outline-none" />
-              </div>
+              <div class="flex items-center"><span class="text-white mr-1">$</span><input type="number" [(ngModel)]="priceMin" class="w-full bg-transparent text-white outline-none" /></div>
             </div>
             <span class="text-[#666]">-</span>
             <div class="flex-1 relative border border-[#666] rounded-xl focus-within:border-white transition-colors p-2">
               <label class="text-[10px] text-[#a0a0a0] block uppercase tracking-wider font-bold">Máximo</label>
-              <div class="flex items-center">
-                <span class="text-white mr-1">$</span>
-                <input type="number" [(ngModel)]="priceMax" placeholder="500+" class="w-full bg-transparent text-white outline-none" />
-              </div>
+              <div class="flex items-center"><span class="text-white mr-1">$</span><input type="number" [(ngModel)]="priceMax" placeholder="500+" class="w-full bg-transparent text-white outline-none" /></div>
             </div>
           </div>
         </div>
-        
         <hr class="border-[#333333]">
-
         <div>
           <h3 class="text-white font-bold text-xl mb-6">Servicios y comodidades</h3>
           <div class="grid grid-cols-2 gap-4">
@@ -380,100 +572,66 @@
               <div class="w-6 h-6 border border-[#666] rounded flex items-center justify-center group-hover:border-white transition-colors" [ngClass]="{'bg-black border-black': selectedAmenities.includes(amenity)}">
                 <svg *ngIf="selectedAmenities.includes(amenity)" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
               </div>
-              <input type="checkbox" [checked]="selectedAmenities.includes(amenity)" (change)="toggleAmenity(amenity)" class="hidden" />
-              <span class="text-white text-[16px]">{{ amenity }}</span>
+              <input type="checkbox" [checked]="selectedAmenities.includes(amenity)" (change)="toggleAmenity(amenity)" class="hidden" /><span class="text-white text-[16px]">{{ amenity }}</span>
             </label>
           </div>
         </div>
       </div>
-
       <div class="p-4 border-t border-[#333333] flex justify-between items-center">
         <button (click)="clearAllFilters()" class="text-white font-bold hover:bg-[#2a2a2a] px-4 py-2 rounded-lg underline transition-colors">Quitar todos</button>
-        <button (click)="handleApplyFilters()" class="px-8 py-3.5 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors">
-          Mostrar {{ filteredProperties.length }} alojamientos
-        </button>
+        <button (click)="handleApplyFilters()" class="px-8 py-3.5 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors">Mostrar {{ filteredProperties.length }} alojamientos</button>
       </div>
     </div>
   </div>
 
-  <div *ngIf="isAuthModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+  <div *ngIf="isAuthModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
     <div class="bg-[#1E1E1E] border border-[#333333] rounded-2xl w-full max-w-4xl overflow-hidden flex shadow-2xl relative">
-      <button (click)="isAuthModalOpen = false" class="absolute right-4 top-4 z-10 p-2 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors backdrop-blur-md">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-      </button>
+      <button (click)="isAuthModalOpen = false" class="absolute right-4 top-4 z-10 p-2 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors backdrop-blur-md"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
       <div class="hidden md:block md:w-1/2 relative bg-gray-900">
         <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-80" alt="Vista de la propiedad">
         <div class="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/40 to-transparent"></div>
         <div class="absolute bottom-10 left-8 right-8">
           <h3 class="text-3xl font-bold text-white mb-2">Bienvenido a casa</h3>
-          <p class="text-gray-300">Encuentra el espacio perfecto para tu próxima estancia en la capital y sus alrededores.</p>
+          <p class="text-gray-300">Encuentra el espacio perfecto para tu próxima estancia en la capital.</p>
         </div>
       </div>
       <div class="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center bg-[#1E1E1E]">
         <h2 class="text-2xl font-bold text-white mb-2">{{ authMode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta' }}</h2>
-        <p class="text-[#a0a0a0] mb-8">{{ authMode === 'login' ? 'Qué gusto verte de nuevo por aquí.' : 'Únete a la comunidad de anfitriones y viajeros.' }}</p>
-        <div class="mb-6">
-          <button class="w-full flex items-center justify-center gap-2 py-2.5 border border-[#333333] rounded-lg hover:bg-[#2a2a2a] text-white transition-colors font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.2,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.1,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.25,22C17.6,22 21.5,18.33 21.5,12.91C21.5,11.76 21.35,11.1 21.35,11.1V11.1Z"/></svg>
-            Google
-          </button>
-        </div>
-        <div class="relative flex items-center py-2 mb-4">
-          <div class="flex-grow border-t border-[#333333]"></div>
-          <span class="flex-shrink-0 mx-4 text-[#a0a0a0] text-sm">o con tu correo</span>
-          <div class="flex-grow border-t border-[#333333]"></div>
-        </div>
-        <div class="space-y-4">
+        <div class="space-y-4 mt-8">
           <div *ngIf="authMode === 'register'" class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0]"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input type="text" [(ngModel)]="authName" placeholder="Nombre completo" class="w-full pl-11 pr-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] focus:border-[#0055FF] focus:ring-1 focus:ring-[#0055FF] outline-none transition-all" />
+            <input type="text" [(ngModel)]="authName" placeholder="Nombre completo" class="w-full pl-11 pr-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] focus:border-[#0055FF] outline-none" />
           </div>
           <div class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0]"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            <input type="email" [(ngModel)]="authEmail" placeholder="Correo electrónico" class="w-full pl-11 pr-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] focus:border-[#0055FF] focus:ring-1 focus:ring-[#0055FF] outline-none transition-all" />
+            <input type="email" [(ngModel)]="authEmail" placeholder="Correo electrónico" class="w-full pl-11 pr-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] focus:border-[#0055FF] outline-none" />
           </div>
           <div class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2 text-[#a0a0a0]"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" [(ngModel)]="authPassword" placeholder="Contraseña" class="w-full pl-11 pr-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] focus:border-[#0055FF] focus:ring-1 focus:ring-[#0055FF] outline-none transition-all" />
+            <input type="password" [(ngModel)]="authPassword" placeholder="Contraseña" class="w-full pl-11 pr-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] focus:border-[#0055FF] outline-none" />
           </div>
         </div>
-        <button (click)="handleAuth()" class="w-full py-4 mt-6 bg-[#0055FF] text-white font-semibold rounded-lg hover:bg-[#0044CC] transition-colors shadow-lg shadow-blue-900/20">
-          {{ authMode === 'login' ? 'Continuar' : 'Registrarse' }}
-        </button>
+        <button (click)="handleAuth()" class="w-full py-4 mt-6 bg-[#0055FF] text-white font-semibold rounded-lg hover:bg-[#0044CC] transition-colors shadow-lg shadow-blue-900/20">{{ authMode === 'login' ? 'Continuar' : 'Registrarse' }}</button>
         <div class="flex items-center gap-2 mt-6 justify-center text-sm">
-          <span class="text-[#a0a0a0]">
-            {{ authMode === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes una cuenta?' }}
-          </span>
-          <button (click)="authMode = authMode === 'login' ? 'register' : 'login'" class="text-[#0055FF] font-semibold hover:underline">
-            {{ authMode === 'login' ? 'Regístrate' : 'Inicia sesión' }}
-          </button>
+          <span class="text-[#a0a0a0]">{{ authMode === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes una cuenta?' }}</span>
+          <button (click)="authMode = authMode === 'login' ? 'register' : 'login'" class="text-[#0055FF] font-semibold hover:underline">{{ authMode === 'login' ? 'Regístrate' : 'Inicia sesión' }}</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div *ngIf="isContactModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+  <div *ngIf="isContactModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
     <div class="bg-[#1E1E1E] border border-[#333333] rounded-xl w-full max-w-md mx-4 overflow-hidden">
       <div class="flex items-center justify-between p-4 border-b border-[#333333]">
         <h2 class="text-lg font-semibold text-white">Contactar al Anfitrión</h2>
-        <button (click)="isContactModalOpen = false" class="p-2 hover:bg-[#2a2a2a] rounded-full transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
+        <button (click)="isContactModalOpen = false" class="p-2 hover:bg-[#2a2a2a] rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
       </div>
-      <div class="p-4">
-        <textarea [(ngModel)]="contactMessage" placeholder="Escribe tu mensaje al anfitrión..." rows="5" class="w-full px-3 py-2 bg-[#2a2a2a] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] outline-none focus:border-[#0055FF] resize-none"></textarea>
-      </div>
-      <div class="p-4 border-t border-[#333333]">
-        <button (click)="handleSendMessage()" class="w-full py-3 bg-[#0055FF] text-white font-semibold rounded-lg hover:bg-[#0044CC] transition-colors flex items-center justify-center gap-2">
-          Enviar Mensaje
-        </button>
-      </div>
+      <div class="p-4"><textarea [(ngModel)]="contactMessage" placeholder="Escribe tu mensaje al anfitrión..." rows="5" class="w-full px-3 py-2 bg-[#2a2a2a] border border-[#333333] rounded-lg text-white placeholder-[#a0a0a0] outline-none focus:border-[#0055FF] resize-none"></textarea></div>
+      <div class="p-4 border-t border-[#333333]"><button (click)="handleSendMessage()" class="w-full py-3 bg-[#0055FF] text-white font-semibold rounded-lg hover:bg-[#0044CC]">Enviar Mensaje</button></div>
     </div>
   </div>
 
-  <div *ngIf="toastMsg" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-    <div class="bg-[#0055FF] text-white px-6 py-3 rounded-lg shadow-lg font-medium">
-      {{ toastMsg }}
-    </div>
+  <div *ngIf="toastMsg" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div class="bg-[#0055FF] text-white px-6 py-3 rounded-lg shadow-lg font-medium">{{ toastMsg }}</div>
   </div>
 </div>

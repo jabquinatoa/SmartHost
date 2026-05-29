@@ -24,12 +24,14 @@ interface Property {
   templateUrl: './catalogo.html'
 })
 export class CatalogoComponent {
+  // Estados de Vista
   activeView: 'catalogo' | 'detalle' | 'admin' = 'catalogo';
   selectedProperty: Property | null = null;
   toastMsg: string | null = null;
+  
+  // Variables del Catálogo
   activeFilter = 'Todos';
   favorites: number[] = [];
-  
   activeSearchTab: 'destino' | 'fechas' | 'huespedes' | null = null;
   selectedDestino = '';
   selDateIn: Date | null = null;
@@ -37,22 +39,20 @@ export class CatalogoComponent {
   adults = 2;
   children = 0;
 
+  // Variables Generales Catálogo
   baseMonth = new Date();
   monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-
   resDateIn = '';
   resDateOut = '';
   resInputTypeIn = 'text';
   resInputTypeOut = 'text';
-
   isContactModalOpen = false;
   isFiltrosOpen = false;
   isUserMenuOpen = false;
   priceMin = '';
   priceMax = '';
   selectedAmenities: string[] = [];
-  
   isAuthModalOpen = false;
   authMode: 'login' | 'register' = 'login';
   authEmail = '';
@@ -89,7 +89,7 @@ export class CatalogoComponent {
         'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop',
       ],
       amenities: ['WiFi', 'Cocina', 'TV', 'Estacionamiento'],
-      description: 'Hermoso loft completamente amueblado a pasos del Parque La Carolina y centros comerciales. Cuenta con todas las comodidades modernas, excelente ubicación cerca de restaurantes y estaciones del Metro de Quito. Ideal para negocios o turismo.',
+      description: 'Hermoso loft completamente amueblado a pasos del Parque La Carolina y centros comerciales.',
     },
     {
       id: 2,
@@ -107,7 +107,7 @@ export class CatalogoComponent {
         'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=400&h=300&fit=crop',
       ],
       amenities: ['WiFi', 'Cocina', 'Mascotas'],
-      description: 'Encantadora casa colonial con patio central en el corazón del Centro Histórico mejor conservado de América. Arquitectura tradicional quiteña con interiores renovados y vista a las cúpulas de las iglesias.',
+      description: 'Encantadora casa colonial con patio central en el corazón del Centro Histórico.',
     },
     {
       id: 3,
@@ -125,103 +125,120 @@ export class CatalogoComponent {
         'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=300&fit=crop',
       ],
       amenities: ['WiFi', 'TV', 'Estacionamiento', 'Jacuzzi'],
-      description: 'Suite de lujo con acabados de primera calidad y balcón con vista directa al volcán Pichincha. Edificio inteligente con seguridad 24/7, gimnasio y terraza comunal. Perfecta para viajeros de negocios.',
-    },
-    {
-      id: 4,
-      name: 'Departamento Familiar Acogedor',
-      location: 'Quitumbe, Quito Sur',
-      price: 45,
-      rating: 4.7,
-      reviews: 156,
-      type: 'Departamentos',
-      capacity: 5,
-      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=800&fit=crop',
-      images: [
-        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1502672023488-70e25813eb80?w=400&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
-      ],
-      amenities: ['WiFi', 'Cocina', 'TV', 'Estacionamiento'],
-      description: 'Amplio departamento familiar en sector residencial y tranquilo. Excelente conexión de transporte a pocos minutos de la Terminal Terrestre y paradas del metro. Cocina completamente equipada y áreas seguras.',
-    },
-    {
-      id: 5,
-      name: 'Quinta Vacacional con Piscina',
-      location: 'Cumbayá, Valles',
-      price: 120,
-      rating: 4.9,
-      reviews: 203,
-      type: 'Casas',
-      capacity: 8,
-      image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=800&fit=crop',
-      images: [
-        'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?w=400&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
-      ],
-      amenities: ['WiFi', 'Cocina', 'Piscina', 'Estacionamiento', 'Mascotas'],
-      description: 'Disfruta del clima cálido de Cumbayá en esta hermosa propiedad con áreas verdes, zona de BBQ y piscina temperada. El escape de fin de semana perfecto sin alejarte mucho de la ciudad.',
-    },
-    {
-      id: 6,
-      name: 'Suite Estilo Bohemio',
-      location: 'La Mariscal, Quito Centro',
-      price: 50,
-      rating: 4.6,
-      reviews: 92,
-      type: 'Suites',
-      capacity: 2,
-      image: 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=800&fit=crop',
-      images: [
-        'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop',
-      ],
-      amenities: ['WiFi', 'Cocina', 'Mascotas'],
-      description: 'Suite única decorada con arte local en el vibrante barrio de La Mariscal. A poca distancia de plazas, cafés culturales y la vida nocturna de la Plaza Foch. Ambiente tranquilo y acogedor.',
+      description: 'Suite de lujo con acabados de primera calidad y balcón con vista directa al volcán.',
     }
   ];
 
-  get month1Title() {
-    return `${this.monthNames[this.baseMonth.getMonth()]} ${this.baseMonth.getFullYear()}`;
+  // ================== VARIABLES MODO ADMINISTRADOR ==================
+  adminView: 'inicio' | 'propiedades' | 'mensajes' | 'calendario' = 'inicio';
+  isAdminSidebarOpen = true;
+
+  // ---- Calendario Admin ----
+  propiedadesCalendario = [
+    { id: 1, nombre: "Loft Cumbaya", diasOcupados: [3, 4, 5, 12, 13, 14, 15, 22, 23] },
+    { id: 2, nombre: "Suite Carolina", diasOcupados: [1, 2, 8, 9, 10, 18, 19, 28, 29, 30] },
+    { id: 3, nombre: "Depto. La Floresta", diasOcupados: [5, 6, 7, 15, 16, 17, 25, 26] },
+    { id: 4, nombre: "Estudio Gonzalez Suarez", diasOcupados: [10, 11, 12, 20, 21, 22, 23] },
+  ];
+  adminMesActual: Date = new Date();
+  adminDiasSeleccionados: number[] = [];
+  adminPropiedadSeleccionadaId: number = 1;
+  adminDiasSemana = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+
+  // ---- Propiedades Admin ----
+  adminPropiedadesFiltro: string = "Todos";
+  adminPropiedadesList = [
+    { id: 1, nombre: "Loft Centro Historico", estado: "Libre", imagen: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop", precio: "$85/noche" },
+    { id: 2, nombre: "Departamento Playa", estado: "Ocupado", imagen: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop", precio: "$120/noche" },
+    { id: 3, nombre: "Suite Ejecutiva", estado: "Mantenimiento", imagen: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop", precio: "$95/noche" },
+    { id: 4, nombre: "Estudio Moderno", estado: "Libre", imagen: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop", precio: "$65/noche" },
+    { id: 5, nombre: "Penthouse Vista Mar", estado: "Ocupado", imagen: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop", precio: "$200/noche" },
+    { id: 6, nombre: "Apartamento Familiar", estado: "Libre", imagen: "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop", precio: "$110/noche" },
+  ];
+
+  get adminPropiedadesFiltradas() {
+    if (this.adminPropiedadesFiltro === "Todos") return this.adminPropiedadesList;
+    return this.adminPropiedadesList.filter(p => p.estado === this.adminPropiedadesFiltro);
   }
 
+  // ---- Mensajes Admin ----
+  adminMensajesTab: 'chats' | 'resenas' = 'chats';
+  adminMensajesBusqueda: string = "";
+  adminMensajeInput: string = "";
+  
+  adminContactos = [
+    { id: 1, nombre: "Carlos Martinez", ultimo: "Gracias por la informacion!", tiempo: "hace 5 min", noLeidos: 2, propiedad: "Loft Centro", imagen: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&h=200&fit=crop", fechas: "15-18 Ene 2026" },
+    { id: 2, nombre: "Ana Garcia", ultimo: "A que hora es el check-in?", tiempo: "hace 30 min", noLeidos: 0, propiedad: "Suite Ejecutiva", imagen: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=200&h=200&fit=crop", fechas: "20-25 Ene 2026" },
+    { id: 3, nombre: "Pedro Ruiz", ultimo: "Perfecto, nos vemos manana", tiempo: "hace 1 hora", noLeidos: 0, propiedad: "Estudio Moderno", imagen: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&h=200&fit=crop", fechas: "10-12 Ene 2026" },
+    { id: 4, nombre: "Maria Lopez", ultimo: "Hay estacionamiento disponible?", tiempo: "hace 2 horas", noLeidos: 1, propiedad: "Depto. Playa", imagen: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=200&fit=crop", fechas: "22-28 Ene 2026" },
+    { id: 5, nombre: "Juan Torres", ultimo: "Muchas gracias!", tiempo: "ayer", noLeidos: 0, propiedad: "Loft Centro", imagen: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&h=200&fit=crop", fechas: "5-8 Ene 2026" },
+  ];
+
+  adminContactoActivo = this.adminContactos[0];
+
+  adminMensajesChat = [
+    { id: 1, texto: "Hola! Tengo una reserva para este fin de semana.", enviado: false, hora: "10:30" },
+    { id: 2, texto: "Hola Carlos! Si, ya tenemos tu reserva confirmada para el Loft Centro.", enviado: true, hora: "10:32" },
+    { id: 3, texto: "Perfecto! A que hora puedo hacer el check-in?", enviado: false, hora: "10:35" },
+    { id: 4, texto: "El check-in es a partir de las 14:00. Te enviaremos las instrucciones de acceso por la manana.", enviado: true, hora: "10:38" },
+    { id: 5, texto: "Gracias por la informacion!", enviado: false, hora: "10:40" },
+    { id: 6, texto: "Hay alguna recomendacion de restaurantes cercanos?", enviado: false, hora: "10:45" },
+    { id: 7, texto: "Claro! Hay varios excelentes. Te recomiendo 'La Terraza' a 2 cuadras, tienen comida increible.", enviado: true, hora: "10:48" },
+    { id: 8, texto: "Genial, lo anotare. Gracias!", enviado: false, hora: "10:50" },
+  ];
+
+  adminResenas = [
+    { id: 1, nombre: "Laura Mendez", propiedad: "Loft Centro", rating: 5, texto: "Excelente ubicacion y muy limpio. Volveria sin duda!", fecha: "hace 2 dias" },
+    { id: 2, nombre: "Roberto Diaz", propiedad: "Suite Ejecutiva", rating: 4, texto: "Muy comodo para viajes de trabajo. Solo falta mejor WiFi.", fecha: "hace 1 semana" },
+    { id: 3, nombre: "Carmen Ruiz", propiedad: "Depto. Playa", rating: 5, texto: "Vista increible! La playa a 2 minutos. Perfecto.", fecha: "hace 2 semanas" },
+  ];
+
+  get adminContactosFiltrados() {
+    return this.adminContactos.filter(c => c.nombre.toLowerCase().includes(this.adminMensajesBusqueda.toLowerCase()));
+  }
+
+  adminSeleccionarContacto(contacto: any) {
+    this.adminContactoActivo = contacto;
+  }
+
+  adminEnviarMensaje() {
+    if (this.adminMensajeInput.trim()) {
+      this.adminMensajesChat.push({
+        id: this.adminMensajesChat.length + 1,
+        texto: this.adminMensajeInput,
+        enviado: true,
+        hora: new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
+      });
+      this.adminMensajeInput = "";
+      this.showToast("Mensaje enviado correctamente");
+    }
+  }
+
+
+  // ================== LÓGICA DE CALENDARIO VIAJERO ==================
+  get month1Title() { return `${this.monthNames[this.baseMonth.getMonth()]} ${this.baseMonth.getFullYear()}`; }
   get month2Title() {
     const d = new Date(this.baseMonth.getFullYear(), this.baseMonth.getMonth() + 1, 1);
     return `${this.monthNames[d.getMonth()]} ${d.getFullYear()}`;
   }
-
-  get month1Days() {
-    return this.generateMonthDays(this.baseMonth.getFullYear(), this.baseMonth.getMonth());
-  }
-
-  get month2Days() {
-    return this.generateMonthDays(this.baseMonth.getFullYear(), this.baseMonth.getMonth() + 1);
-  }
+  get month1Days() { return this.generateMonthDays(this.baseMonth.getFullYear(), this.baseMonth.getMonth()); }
+  get month2Days() { return this.generateMonthDays(this.baseMonth.getFullYear(), this.baseMonth.getMonth() + 1); }
 
   generateMonthDays(year: number, month: number) {
     const days = [];
     const firstDay = new Date(year, month, 1).getDay();
     const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
-    
     for (let i = 0; i < adjustedFirstDay; i++) days.push(null);
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     for (let i = 1; i <= daysInMonth; i++) days.push(new Date(year, month, i));
     return days;
   }
 
-  nextMonth() {
-    this.baseMonth = new Date(this.baseMonth.getFullYear(), this.baseMonth.getMonth() + 1, 1);
-  }
-
-  prevMonth() {
-    this.baseMonth = new Date(this.baseMonth.getFullYear(), this.baseMonth.getMonth() - 1, 1);
-  }
+  nextMonth() { this.baseMonth = new Date(this.baseMonth.getFullYear(), this.baseMonth.getMonth() + 1, 1); }
+  prevMonth() { this.baseMonth = new Date(this.baseMonth.getFullYear(), this.baseMonth.getMonth() - 1, 1); }
 
   selectDate(d: Date | null) {
     if (!d) return;
-    
     if (!this.selDateIn || (this.selDateIn && this.selDateOut)) {
       this.selDateIn = d;
       this.selDateOut = null;
@@ -261,6 +278,7 @@ export class CatalogoComponent {
     this.selDateOut = null;
   }
 
+  // ================== CONTROL DE BÚSQUEDA Y FILTROS ==================
   openSearchTab(tab: 'destino' | 'fechas' | 'huespedes') {
     this.activeSearchTab = this.activeSearchTab === tab ? null : tab;
   }
@@ -272,8 +290,7 @@ export class CatalogoComponent {
 
   triggerSearch() {
     this.activeSearchTab = null;
-    const total = this.filteredProperties.length;
-    this.showToast(`Búsqueda aplicada: ${total} propiedades`);
+    this.showToast(`Búsqueda aplicada: ${this.filteredProperties.length} propiedades`);
   }
 
   get filteredProperties() {
@@ -286,29 +303,11 @@ export class CatalogoComponent {
       const max = this.priceMax ? parseFloat(this.priceMax) : Infinity;
       const matchPrice = p.price >= min && p.price <= max;
       const matchAmenities = this.selectedAmenities.every(amenity => p.amenities.includes(amenity));
-
       return matchCategory && matchDestino && matchCapacity && matchPrice && matchAmenities;
     });
   }
 
-  get dynamicNights() {
-    if (!this.resDateIn || !this.resDateOut) return 1;
-    const start = new Date(this.resDateIn).getTime();
-    const end = new Date(this.resDateOut).getTime();
-    const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 1;
-  }
-
-  get subtotal() { return this.selectedProperty ? this.selectedProperty.price * this.dynamicNights : 0; }
-  get serviceFee() { return Math.round(this.subtotal * 0.12); }
-  get total() { return this.subtotal + this.serviceFee; }
-
-  formatIsoDate(dateStr: string): string {
-    if (!dateStr) return 'Añadir fecha';
-    const date = new Date(dateStr + 'T12:00:00');
-    return date.toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
-
+  // ================== UTILIDADES GENERALES ==================
   showToast(message: string) {
     this.toastMsg = message;
     setTimeout(() => this.toastMsg = null, 3000);
@@ -342,19 +341,11 @@ export class CatalogoComponent {
   }
 
   handleAuth() {
-    if (this.authMode === 'login') {
-      this.isLoggedIn = true;
-      this.userName = 'José';
-      this.showToast('Sesión iniciada con éxito');
-    } else {
-      this.isLoggedIn = true;
-      this.userName = this.authName || 'Usuario';
-      this.showToast('Cuenta creada con éxito');
-    }
+    this.isLoggedIn = true;
+    this.userName = this.authMode === 'login' ? 'José' : (this.authName || 'Usuario');
+    this.showToast(this.authMode === 'login' ? 'Sesión iniciada con éxito' : 'Cuenta creada con éxito');
     this.isAuthModalOpen = false;
-    this.authEmail = '';
-    this.authPassword = '';
-    this.authName = '';
+    this.authEmail = ''; this.authPassword = ''; this.authName = '';
   }
 
   logout() {
@@ -364,19 +355,122 @@ export class CatalogoComponent {
     this.showToast('Sesión cerrada');
   }
 
-  goToAdminPanel() {
-    this.isUserMenuOpen = false;
-    this.showToast('Preparando tu panel de anfitrión...');
-    
-    setTimeout(() => {
-      this.activeView = 'admin';
-      window.scrollTo(0, 0);
-    }, 800);
-  }
-
   showWipToast() {
     this.isUserMenuOpen = false;
     this.showToast('Esta función está en construcción 🚧');
+  }
+
+  // ================== FUNCIONES DEL ADMINISTRADOR ==================
+  goToAdminPanel() {
+    this.isUserMenuOpen = false;
+    this.showToast('Preparando tu panel de anfitrión...');
+    setTimeout(() => {
+      this.activeView = 'admin';
+      this.adminView = 'inicio';
+      window.scrollTo(0, 0);
+    }, 100); 
+  }
+
+  exitAdminPanel() {
+    this.activeView = 'catalogo';
+    this.showToast('Volviendo al modo viaje...');
+  }
+
+  setAdminView(view: 'inicio' | 'propiedades' | 'mensajes' | 'calendario') {
+    this.adminView = view;
+    if (window.innerWidth < 1024) this.isAdminSidebarOpen = false;
+  }
+
+  get adminViewTitle() {
+    switch (this.adminView) {
+      case 'inicio': return 'Resumen Operativo';
+      case 'propiedades': return 'Mis Propiedades';
+      case 'mensajes': return 'Centro de Mensajes';
+      case 'calendario': return 'Calendario de Reservas';
+      default: return 'Panel de Control';
+    }
+  }
+
+  // ---- Lógica del Calendario Admin ----
+  get adminPropiedadSeleccionada() {
+    return this.propiedadesCalendario.find(p => p.id === this.adminPropiedadSeleccionadaId) || this.propiedadesCalendario[0];
+  }
+
+  get adminNombreMes() {
+    return this.adminMesActual.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+  }
+
+  get adminDiasEnMes() {
+    return new Date(this.adminMesActual.getFullYear(), this.adminMesActual.getMonth() + 1, 0).getDate();
+  }
+
+  get adminDiaSemanaInicio() {
+    return new Date(this.adminMesActual.getFullYear(), this.adminMesActual.getMonth(), 1).getDay();
+  }
+
+  get adminEmptyDays() {
+    return Array(this.adminDiaSemanaInicio).fill(null);
+  }
+
+  get adminDaysArray() {
+    return Array.from({ length: this.adminDiasEnMes }, (_, i) => i + 1);
+  }
+
+  get adminOcupacionPorcentaje() {
+    return Math.round((this.adminPropiedadSeleccionada.diasOcupados.length / this.adminDiasEnMes) * 100);
+  }
+
+  adminHandlePropiedadChange(event: any) {
+    this.adminPropiedadSeleccionadaId = Number(event.target.value);
+    this.adminDiasSeleccionados = [];
+  }
+
+  adminToggleDia(dia: number) {
+    if (this.adminPropiedadSeleccionada.diasOcupados.includes(dia)) return;
+    const index = this.adminDiasSeleccionados.indexOf(dia);
+    if (index > -1) {
+      this.adminDiasSeleccionados.splice(index, 1);
+    } else {
+      this.adminDiasSeleccionados.push(dia);
+    }
+  }
+
+  adminBloquearFechas() {
+    if (this.adminDiasSeleccionados.length === 0) {
+      this.showToast("Selecciona al menos un dia para bloquear");
+      return;
+    }
+    this.showToast(`Fechas bloqueadas: ${this.adminDiasSeleccionados.length} días en ${this.adminPropiedadSeleccionada.nombre}`);
+    this.adminDiasSeleccionados = [];
+  }
+
+  adminMesAnterior() {
+    this.adminMesActual = new Date(this.adminMesActual.getFullYear(), this.adminMesActual.getMonth() - 1, 1);
+    this.adminDiasSeleccionados = [];
+  }
+
+  adminMesSiguiente() {
+    this.adminMesActual = new Date(this.adminMesActual.getFullYear(), this.adminMesActual.getMonth() + 1, 1);
+    this.adminDiasSeleccionados = [];
+  }
+
+  // ================== DETALLES Y RESERVAS ==================
+  get dynamicNights() {
+    if (!this.resDateIn || !this.resDateOut) return 1;
+    const start = new Date(this.resDateIn).getTime();
+    const end = new Date(this.resDateOut).getTime();
+    const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 1;
+  }
+
+  get subtotal() { return this.selectedProperty ? this.selectedProperty.price * this.dynamicNights : 0; }
+  get serviceFee() { return Math.round(this.subtotal * 0.12); }
+  get total() { return this.subtotal + this.serviceFee; }
+
+  formatIsoDate(dateStr: string): string {
+    if (!dateStr) return 'Añadir fecha';
+    const date = new Date(dateStr + 'T12:00:00');
+    return date.toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   handleReservation() {
@@ -386,21 +480,14 @@ export class CatalogoComponent {
       return;
     }
     this.showToast('Solicitud de reserva enviada al anfitrión');
-    this.resDateIn = '';
-    this.resDateOut = '';
-    this.resInputTypeIn = 'text';
-    this.resInputTypeOut = 'text';
+    this.resDateIn = ''; this.resDateOut = '';
+    this.resInputTypeIn = 'text'; this.resInputTypeOut = 'text';
   }
 
   clearAllFilters() {
-    this.activeFilter = 'Todos';
-    this.selectedDestino = '';
-    this.priceMin = '';
-    this.priceMax = '';
-    this.selectedAmenities = [];
-    this.adults = 2;
-    this.children = 0;
-    this.clearSearchDates();
+    this.activeFilter = 'Todos'; this.selectedDestino = '';
+    this.priceMin = ''; this.priceMax = ''; this.selectedAmenities = [];
+    this.adults = 2; this.children = 0; this.clearSearchDates();
     this.showToast('Filtros limpiados');
   }
 
@@ -413,8 +500,7 @@ export class CatalogoComponent {
     }
     if (this.contactMessage.trim()) {
       this.showToast('Mensaje enviado al anfitrión');
-      this.contactMessage = '';
-      this.isContactModalOpen = false;
+      this.contactMessage = ''; this.isContactModalOpen = false;
     }
   }
 
@@ -428,8 +514,7 @@ export class CatalogoComponent {
 
   handleApplyFilters() {
     this.isFiltrosOpen = false;
-    const total = this.filteredProperties.length;
-    this.showToast(`Filtros extra aplicados: ${total} resultados`);
+    this.showToast(`Filtros extra aplicados: ${this.filteredProperties.length} resultados`);
   }
 
   updateAdults(amount: number, event: Event) {
