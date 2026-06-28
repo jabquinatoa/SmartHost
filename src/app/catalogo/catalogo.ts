@@ -273,7 +273,25 @@ export class CatalogoComponent implements OnInit {
       description: 'Clima cálido garantizado. Esta espectacular villa en Tumbaco ofrece piscina temperada, zona de parrilladas y extensas áreas verdes. La elección perfecta para un fin de semana con amigos o retiros familiares.',
       estado: 'Mantenimiento'
     },
-
+    {
+      id: 12,
+      name: 'Suite Boutique Temática',
+      location: 'La Mariscal, Quito Centro',
+      price: 50,
+      rating: 4.5,
+      reviews: 78,
+      type: 'Suites',
+      capacity: 2,
+      image: 'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800&h=800&fit=crop',
+      images: [
+        'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=1200&h=800&fit=crop',
+        'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=1200&h=800&fit=crop',
+        'https://images.unsplash.com/photo-1505693314120-0d443867891c?w=1200&h=800&fit=crop'
+      ],
+      amenities: ['WiFi', 'TV', 'Estacionamiento'],
+      description: 'Suite con decoración vibrante en el corazón turístico de la capital (Plaza Foch). Tendrás a un paso los mejores restaurantes, cafeterías, vida nocturna y conexiones de transporte rápido.',
+      estado: 'Libre'
+    },
     {
       id: 13,
       name: 'Piso Moderno y Céntrico',
@@ -365,10 +383,10 @@ export class CatalogoComponent implements OnInit {
   filterAmenities = ['WiFi', 'Mascotas', 'Estacionamiento', 'Piscina', 'Cocina', 'Jacuzzi'];
 
   destinations = [
-    { city: 'Quito Norte', neighborhoods: ['La Carolina', 'González Suárez', 'Bellavista', 'Ponceano'] },
-    { city: 'Quito Centro', neighborhoods: ['Centro Histórico', 'La Mariscal', 'San Juan'] },
-    { city: 'Quito Sur', neighborhoods: ['Quitumbe', 'Solanda', 'Villa Flora', 'El Recreo'] },
-    { city: 'Valles', neighborhoods: ['Cumbayá', 'Tumbaco', 'Sangolquí'] },
+    { city: 'Quito Norte', neighborhoods: ['La Carolina', 'González Suárez', 'Bellavista'] },
+    { city: 'Quito Centro', neighborhoods: ['Centro Histórico', 'La Mariscal', 'La Floresta', 'San Marcos'] },
+    { city: 'Quito Sur', neighborhoods: ['Quitumbe', 'Solanda', 'El Recreo', 'La Magdalena'] },
+    { city: 'Valles', neighborhoods: ['Cumbayá', 'Tumbaco'] },
   ];
 
   adminView: 'inicio' | 'propiedades' | 'mensajes' | 'calendario' = 'inicio';
