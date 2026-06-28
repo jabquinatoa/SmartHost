@@ -124,7 +124,7 @@ export class CatalogoComponent implements OnInit {
     {
       id: 4,
       name: 'Departamento Moderno El Recreo',
-      location: 'Quito Sur, Sur de Quito',
+      location: 'El Recreo, Quito Sur',
       price: 55,
       rating: 4.7,
       reviews: 42,
@@ -177,6 +177,140 @@ export class CatalogoComponent implements OnInit {
       amenities: ['WiFi', 'TV', 'Cocina'],
       description: 'Hermoso loft de diseño industrial a minutos del Terminal Terrestre y la Plataforma Gubernamental del Sur. Ideal para viajes rápidos, estudiantes o profesionales que necesitan acceso rápido al sur de la ciudad.',
       estado: 'Ocupado'
+    },
+    {
+      id: 7,
+      name: 'Casa de Retiro con Jardín',
+      location: 'Cumbayá, Valles',
+      price: 150,
+      rating: 5.0,
+      reviews: 64,
+      type: 'Casas',
+      capacity: 8,
+      image: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80',
+      images: [
+        'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80'
+      ],
+      amenities: ['WiFi', 'Cocina', 'Mascotas', 'Estacionamiento', 'Jacuzzi'],
+      description: 'Impresionante casa con amplio jardín cerrado en el cálido valle de Cumbayá. Perfecto para que tus mascotas jueguen con total seguridad o para armar tus reuniones familiares. Incluye zona de BBQ y amplios espacios de descanso.',
+      estado: 'Libre'
+    },
+    {
+      id: 8,
+      name: 'Suite Minimalista Ejecutiva',
+      location: 'Bellavista, Quito Norte',
+      price: 45,
+      rating: 4.8,
+      reviews: 156,
+      type: 'Suites',
+      capacity: 2,
+      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
+      images: [
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db?auto=format&fit=crop&w=1200&q=80'
+      ],
+      amenities: ['WiFi', 'TV'],
+      description: 'Pequeña, elegante y con todo lo que necesitas. Un espacio diseñado meticulosamente para estancias cortas, con escritorio de trabajo, luz natural y acceso rápido a vías principales de la capital.',
+      estado: 'Libre'
+    },
+    {
+      id: 9,
+      name: 'Loft con Terraza Privada',
+      location: 'La Floresta, Quito Centro',
+      price: 75,
+      rating: 4.9,
+      reviews: 112,
+      type: 'Lofts',
+      capacity: 2,
+      image: 'https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=800&q=80',
+      images: [
+        'https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1200&q=80'
+      ],
+      amenities: ['WiFi', 'TV', 'Cocina', 'Mascotas'],
+      description: 'Ubicado en el barrio más cultural y bohemio de la ciudad. Este loft destaca por su amplia terraza privada, ideal para tomar un café por la mañana, leer un libro o disfrutar del atardecer quiteño.',
+      estado: 'Libre'
+    },
+    {
+      id: 10,
+      name: 'Penthouse de Lujo',
+      location: 'González Suárez, Quito Norte',
+      price: 180,
+      rating: 5.0,
+      reviews: 42,
+      type: 'Departamentos',
+      capacity: 6,
+      image: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80',
+      images: [
+        'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1502672260266-1c1e525044c7?auto=format&fit=crop&w=1200&q=80'
+      ],
+      amenities: ['WiFi', 'TV', 'Cocina', 'Estacionamiento', 'Piscina', 'Jacuzzi'],
+      description: 'Exclusivo penthouse con acabados de primera en el sector más cotizado de Quito. Cuenta con ventanales de piso a techo, jacuzzi privado, y acceso a todas las áreas exclusivas del edificio inteligente.',
+      estado: 'Ocupado'
+    },
+    {
+      id: 11,
+      name: 'Villa Moderna con Piscina',
+      location: 'Tumbaco, Valles',
+      price: 220,
+      rating: 4.9,
+      reviews: 58,
+      type: 'Casas',
+      capacity: 10,
+      image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80',
+      images: [
+        'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80'
+      ],
+      amenities: ['WiFi', 'TV', 'Cocina', 'Estacionamiento', 'Piscina', 'Mascotas'],
+      description: 'Clima cálido garantizado. Esta espectacular villa en Tumbaco ofrece piscina temperada, zona de parrilladas y extensas áreas verdes. La elección perfecta para un fin de semana con amigos o retiros familiares.',
+      estado: 'Mantenimiento'
+    },
+
+    {
+      id: 13,
+      name: 'Piso Moderno y Céntrico',
+      location: 'La Magdalena, Quito Sur',
+      price: 70,
+      rating: 4.6,
+      reviews: 92,
+      type: 'Departamentos',
+      capacity: 5,
+      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+      images: [
+        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80'
+      ],
+      amenities: ['WiFi', 'TV', 'Cocina'],
+      description: 'Amplio departamento familiar cerca de vías principales y conexión al Metro de Quito. Espacios muy bien distribuidos y una zona de lavandería equipada para tu máxima comodidad.',
+      estado: 'Libre'
+    },
+    {
+      id: 14,
+      name: 'Casa Histórica San Marcos',
+      location: 'San Marcos, Quito Centro',
+      price: 90,
+      rating: 4.9,
+      reviews: 205,
+      type: 'Casas',
+      capacity: 5,
+      image: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=800&q=80',
+      images: [
+        'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80'
+      ],
+      amenities: ['WiFi', 'Cocina', 'Mascotas'],
+      description: 'Vive la historia en este barrio residencial y tranquilo del Centro Histórico. Patios interiores con piletas, corredores adornados y un ambiente mágico que te transporta al pasado quiteño.',
+      estado: 'Ocupado'
     }
   ];
 
@@ -190,7 +324,7 @@ export class CatalogoComponent implements OnInit {
     { id: 2, propiedad: 'Loft Moderno Parque La Carolina', descripcion: 'Reposición sábanas', asignado: 'Juan', completada: false }
   ];
 
-  activeView: 'catalogo' | 'detalle' | 'admin' = 'catalogo';
+  activeView: 'catalogo' | 'detalle' | 'admin' | 'favoritos' | 'mis-viajes' = 'catalogo';
   selectedProperty: Property | null = null;
   toastMsg: string | null = null;
   
@@ -206,13 +340,15 @@ export class CatalogoComponent implements OnInit {
   baseMonth = new Date();
   monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-  resDateIn = '';
-  resDateOut = '';
-  resInputTypeIn = 'text';
-  resInputTypeOut = 'text';
+  
+  // Modales de la Tarjeta de Reserva
+  isDetailCalendarOpen = false;
+  isDetailGuestOpen = false;
+
   isContactModalOpen = false;
   isFiltrosOpen = false;
   isUserMenuOpen = false;
+  isNotificationsOpen = false;
   priceMin = '';
   priceMax = '';
   selectedAmenities: string[] = [];
@@ -239,9 +375,7 @@ export class CatalogoComponent implements OnInit {
   isAdminSidebarOpen = true;
   isAdminPropertyModalOpen = false;
   isEditingProperty = false;
-  adminPropertyForm = {
-    id: 0, nombre: '', precio: '', descripcion: '', estado: 'Libre', imagen: ''
-  };
+  adminPropertyForm = { id: 0, nombre: '', precio: '', descripcion: '', estado: 'Libre', imagen: '' };
   adminReservaSeleccionada: Reserva | null = null;
 
   propiedadesCalendario = [
@@ -304,37 +438,23 @@ export class CatalogoComponent implements OnInit {
   get adminSearchRes() {
     if (!this.adminSearchQuery.trim()) return [];
     const q = this.adminSearchQuery.toLowerCase();
-    
-    const resProps = this.properties
-      .filter(p => p.name.toLowerCase().includes(q) || p.location.toLowerCase().includes(q))
-      .map(p => ({ type: 'Propiedad', title: p.name, subtitle: p.location, obj: p }));
-      
-    const resReservas = this.reservasBase
-      .filter(r => r.huesped.toLowerCase().includes(q) || r.nombrePropiedad.toLowerCase().includes(q))
-      .map(r => ({ type: 'Reserva', title: `Reserva de ${r.huesped}`, subtitle: r.nombrePropiedad, obj: r }));
-    
+    const resProps = this.properties.filter(p => p.name.toLowerCase().includes(q) || p.location.toLowerCase().includes(q)).map(p => ({ type: 'Propiedad', title: p.name, subtitle: p.location, obj: p }));
+    const resReservas = this.reservasBase.filter(r => r.huesped.toLowerCase().includes(q) || r.nombrePropiedad.toLowerCase().includes(q)).map(r => ({ type: 'Reserva', title: `Reserva de ${r.huesped}`, subtitle: r.nombrePropiedad, obj: r }));
     return [...resProps, ...resReservas].slice(0, 5);
   }
 
   hideAdminSearchDelay() { setTimeout(() => this.isAdminSearchOpen = false, 200); }
 
   clickAdminSearch(res: any) {
-    if (res.type === 'Propiedad') {
-      this.setAdminView('propiedades');
-      this.adminOpenEditarPropiedad(res.obj);
-    } else if (res.type === 'Reserva') {
-      this.setAdminView('inicio');
-      this.verDetallesReserva(res.obj);
-    }
+    if (res.type === 'Propiedad') { this.setAdminView('propiedades'); this.adminOpenEditarPropiedad(res.obj); }
+    else if (res.type === 'Reserva') { this.setAdminView('inicio'); this.verDetallesReserva(res.obj); }
     this.adminSearchQuery = '';
     this.isAdminSearchOpen = false;
   }
 
-  isNotificationsOpen = false;
   adminNotificaciones = [
     { id: 1, titulo: "Nueva actualización", mensaje: "¡Bienvenido a tu panel renovado de Smart Host!", tiempo: "Hace 5 min", leida: false },
-    { id: 2, titulo: "Mensaje de Pedro Ruiz", mensaje: "Perfecto, nos vemos mañana", tiempo: "Hace 1 hora", leida: false },
-    { id: 3, titulo: "Limpieza pendiente", mensaje: "Suite Ejecutiva requiere limpieza", tiempo: "Hace 1 día", leida: true }
+    { id: 2, titulo: "Mensaje de Pedro Ruiz", mensaje: "Perfecto, nos vemos mañana", tiempo: "Hace 1 hora", leida: false }
   ];
 
   get notificacionesNoLeidas() { return this.adminNotificaciones.filter(n => !n.leida).length; }
@@ -349,48 +469,18 @@ export class CatalogoComponent implements OnInit {
   adminMensajeInput: string = "";
   
   adminContactos: Contacto[] = [
-    { 
-      id: 1, nombre: "Carlos Martinez", ultimo: "Gracias por la informacion!", tiempo: "10:40", noLeidos: 2, propiedad: "Loft Moderno Parque La Carolina", imagen: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&h=200&fit=crop", fechas: "15-18 Ene 2026",
-      chat: [
-        { id: 1, texto: "Hola! Tengo una reserva para este fin de semana.", enviado: false, hora: "10:30" },
-        { id: 2, texto: "Hola Carlos! Si, ya tenemos tu reserva confirmada.", enviado: true, hora: "10:32" },
-        { id: 3, texto: "Perfecto! A que hora puedo hacer el check-in?", enviado: false, hora: "10:35" },
-        { id: 4, texto: "El check-in es a partir de las 14:00.", enviado: true, hora: "10:38" },
-        { id: 5, texto: "Gracias por la informacion!", enviado: false, hora: "10:40" }
-      ]
-    },
-    { 
-      id: 2, nombre: "Ana Garcia", ultimo: "A que hora es el check-in?", tiempo: "09:15", noLeidos: 0, propiedad: "Suite Ejecutiva con Vista al Pichincha", imagen: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=200&h=200&fit=crop", fechas: "20-25 Ene 2026",
-      chat: [
-        { id: 1, texto: "Buenos días, tengo una duda sobre la suite.", enviado: false, hora: "09:00" },
-        { id: 2, texto: "Buenos días Ana, dime, ¿en qué te puedo ayudar?", enviado: true, hora: "09:05" },
-        { id: 3, texto: "A que hora es el check-in?", enviado: false, hora: "09:15" }
-      ]
-    },
-    { 
-      id: 3, nombre: "Pedro Ruiz", ultimo: "Perfecto, nos vemos mañana", tiempo: "Ayer", noLeidos: 0, propiedad: "Casa Patrimonial Restaurada", imagen: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=200&fit=crop", fechas: "10-12 Ene 2026",
-      chat: [
-        { id: 1, texto: "Hola, ya llegamos a Quito, estamos en camino a la casa.", enviado: false, hora: "15:00" },
-        { id: 2, texto: "¡Excelente! El guardia ya tiene sus llaves.", enviado: true, hora: "15:10" },
-        { id: 3, texto: "Perfecto, nos vemos mañana", enviado: false, hora: "15:15" }
-      ]
-    }
+    { id: 1, nombre: "Carlos Martinez", ultimo: "Gracias por la info!", tiempo: "10:40", noLeidos: 2, propiedad: "Loft Moderno Parque La Carolina", imagen: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&h=200&fit=crop", fechas: "15-18 Ene 2026", chat: [] }
   ];
-
   adminContactoActivo = this.adminContactos[0];
-
-  adminResenas = [
+  
+  adminResenas: any[] = [
     { id: 1, nombre: "Laura Mendez", propiedad: "Loft Moderno Parque La Carolina", rating: 5, texto: "Excelente ubicacion y muy limpio. Volveria sin duda!", fecha: "hace 2 dias" },
     { id: 2, nombre: "Roberto Diaz", propiedad: "Suite Ejecutiva con Vista al Pichincha", rating: 4, texto: "Muy comodo para viajes de trabajo. Solo falta mejor WiFi.", fecha: "hace 1 semana" }
   ];
 
   get adminContactosFiltrados() { return this.adminContactos.filter(c => c.nombre.toLowerCase().includes(this.adminMensajesBusqueda.toLowerCase())); }
-  get ocupacionPorcentajeGeneral() {
-    if (this.properties.length === 0) return 0;
-    const ocupadas = this.properties.filter(p => p.estado === 'Ocupado').length;
-    return Math.round((ocupadas / this.properties.length) * 100) + 60;
-  }
-  get totalReservasMes() { return 13 + this.reservasBase.length; }
+  get ocupacionPorcentajeGeneral() { return 75; }
+  get totalReservasMes() { return 15; }
   get totalLimpiezasPendientes() { return this.tareasLimpieza.filter(t => !t.completada).length; }
   get totalMensajesNuevos() { return this.adminContactos.reduce((total, contacto) => total + contacto.noLeidos, 0); }
   get checkinsHoy() { return this.reservasBase; }
@@ -402,7 +492,19 @@ export class CatalogoComponent implements OnInit {
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
-        if (parsed.properties) this.properties = parsed.properties;
+        if (parsed.properties) {
+          // Hidratación: Asegurar que todas las propiedades tengan un arreglo de imágenes válido
+          this.properties = parsed.properties.map((p: Property) => {
+            if (!p.images || p.images.length < 3) {
+              p.images = [
+                p.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop',
+                'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
+                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop'
+              ];
+            }
+            return p;
+          });
+        }
         if (parsed.favorites) this.favorites = parsed.favorites;
         if (parsed.reservasBase) {
           this.reservasBase = parsed.reservasBase.map((r: any) => ({
@@ -451,7 +553,7 @@ export class CatalogoComponent implements OnInit {
       setTimeout(() => element.classList.remove('ring-2', 'ring-[#0055FF]'), 1500);
     }
   }
-
+  
   verDetallesReserva(res: Reserva) { this.adminReservaSeleccionada = res; }
   cerrarDetallesReserva() { this.adminReservaSeleccionada = null; }
   marcarLimpieza(tarea: TareaLimpieza) {
@@ -518,7 +620,7 @@ export class CatalogoComponent implements OnInit {
     setTimeout(() => { this.activeView = 'admin'; this.adminView = 'inicio'; window.scrollTo(0, 0); }, 100); 
   }
   exitAdminPanel() { this.activeView = 'catalogo'; this.showToast('Volviendo al modo viaje...'); }
-  setAdminView(view: 'inicio' | 'propiedades' | 'mensajes' | 'calendario') {
+  setAdminView(view: any) {
     this.adminView = view;
     if (window.innerWidth < 1024) this.isAdminSidebarOpen = false;
   }
@@ -544,12 +646,14 @@ export class CatalogoComponent implements OnInit {
     if (index > -1) this.adminDiasSeleccionados.splice(index, 1);
     else this.adminDiasSeleccionados.push(dia);
   }
+  
   adminBloquearFechas() {
     if (this.adminDiasSeleccionados.length === 0) { this.showToast("Selecciona al menos un dia para bloquear"); return; }
     this.adminPropiedadSeleccionada.diasOcupados.push(...this.adminDiasSeleccionados);
     this.showToast(`Fechas bloqueadas: ${this.adminDiasSeleccionados.length} días en ${this.adminPropiedadSeleccionada.nombre}`);
     this.adminDiasSeleccionados = []; this.saveData();
   }
+  
   adminMesAnterior() { this.adminMesActual = new Date(this.adminMesActual.getFullYear(), this.adminMesActual.getMonth() - 1, 1); this.adminDiasSeleccionados = []; }
   adminMesSiguiente() { this.adminMesActual = new Date(this.adminMesActual.getFullYear(), this.adminMesActual.getMonth() + 1, 1); this.adminDiasSeleccionados = []; }
 
@@ -612,14 +716,26 @@ export class CatalogoComponent implements OnInit {
   }
 
   showToast(message: string) { this.toastMsg = message; setTimeout(() => this.toastMsg = null, 3000); }
+  
   toggleFavorite(event: Event, propertyId: number) {
     event.stopPropagation();
     if (this.favorites.includes(propertyId)) { this.favorites = this.favorites.filter(id => id !== propertyId); this.showToast('Eliminado de favoritos'); }
     else { this.favorites.push(propertyId); this.showToast('Añadido a favoritos'); }
     this.saveData();
   }
-  handlePropertyClick(property: Property) { this.selectedProperty = property; this.activeView = 'detalle'; window.scrollTo(0, 0); }
-  handleBackToCatalog() { this.activeView = 'catalogo'; this.selectedProperty = null; }
+
+  handlePropertyClick(property: Property) { 
+    this.selectedProperty = property; 
+    this.activeView = 'detalle'; 
+    window.scrollTo(0, 0); 
+  }
+
+  handleBackToCatalog() { 
+    this.activeView = 'catalogo'; 
+    this.selectedProperty = null; 
+    this.isDetailCalendarOpen = false; 
+    this.isDetailGuestOpen = false;
+  }
 
   openAuthModal(mode: 'login' | 'register') { this.authMode = mode; this.isAuthModalOpen = true; }
   handleAuth() {
@@ -631,36 +747,42 @@ export class CatalogoComponent implements OnInit {
   showWipToast() { this.isUserMenuOpen = false; this.showToast('Esta función está en construcción 🚧'); }
 
   get dynamicNights() {
-    if (!this.resDateIn || !this.resDateOut) return 1;
-    const diffDays = Math.ceil((new Date(this.resDateOut).getTime() - new Date(this.resDateIn).getTime()) / (1000 * 60 * 60 * 24));
+    if (!this.selDateIn || !this.selDateOut) return 1;
+    const diffDays = Math.ceil((this.selDateOut.getTime() - this.selDateIn.getTime()) / (1000 * 60 * 60 * 24));
     return diffDays > 0 ? diffDays : 1;
   }
   get subtotal() { return this.selectedProperty ? this.selectedProperty.price * this.dynamicNights : 0; }
   get serviceFee() { return Math.round(this.subtotal * 0.12); }
   get total() { return this.subtotal + this.serviceFee; }
-  formatIsoDate(dateStr: string): string { return !dateStr ? 'Añadir fecha' : new Date(dateStr + 'T12:00:00').toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' }); }
+  
+  formatIsoDate(d: Date | null): string { 
+    return !d ? 'Añadir fecha' : d.toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' }); 
+  }
 
   handleReservation() {
     if (!this.isLoggedIn) { this.openAuthModal('login'); this.showToast('Inicia sesión para solicitar una reserva'); return; }
-    if (!this.resDateIn || !this.resDateOut || !this.selectedProperty) { this.showToast('Por favor selecciona las fechas de tu reserva'); return; }
+    if (!this.selDateIn || !this.selDateOut || !this.selectedProperty) { this.showToast('Por favor selecciona las fechas de tu reserva'); return; }
     
-    this.reservasBase.push({ id: Date.now(), propiedadId: this.selectedProperty.id, nombrePropiedad: this.selectedProperty.name, huesped: this.userName || 'Viajero', fechaCheckIn: new Date(this.resDateIn + 'T12:00:00'), fechaCheckOut: new Date(this.resDateOut + 'T12:00:00'), estado: 'Pendiente' });
-    this.tareasLimpieza.push({ id: Date.now(), propiedad: this.selectedProperty.name, descripcion: 'Limpieza post-reserva programada', asignado: 'Por asignar', completada: false });
+    this.reservasBase.push({ 
+      id: Date.now(), 
+      propiedadId: this.selectedProperty.id, 
+      nombrePropiedad: this.selectedProperty.name, 
+      huesped: this.userName || 'Viajero', 
+      fechaCheckIn: this.selDateIn, 
+      fechaCheckOut: this.selDateOut, 
+      estado: 'Pendiente' 
+    });
     
-    const calProp = this.propiedadesCalendario.find(p => p.id === this.selectedProperty?.id);
-    if (calProp) {
-      let currentDate = new Date(this.resDateIn + 'T12:00:00'); const endDate = new Date(this.resDateOut + 'T12:00:00');
-      while (currentDate <= endDate) { calProp.diasOcupados.push(currentDate.getDate()); currentDate.setDate(currentDate.getDate() + 1); }
-    }
-    
-    this.selectedProperty.estado = 'Ocupado';
-    this.adminNotificaciones.unshift({ id: Date.now(), titulo: 'Nueva Reserva', mensaje: `${this.userName || 'Viajero'} ha reservado ${this.selectedProperty.name}`, tiempo: 'ahora', leida: false });
     this.showToast('¡Reserva confirmada con éxito!');
-    this.resDateIn = ''; this.resDateOut = ''; this.resInputTypeIn = 'text'; this.resInputTypeOut = 'text';
-    this.saveData(); setTimeout(() => this.handleBackToCatalog(), 1500);
+    this.clearSearchDates();
+    this.isDetailCalendarOpen = false;
+    this.isDetailGuestOpen = false;
+    this.saveData(); 
+    setTimeout(() => this.handleBackToCatalog(), 1500);
   }
 
   clearAllFilters() { this.activeFilter = 'Todos'; this.selectedDestino = ''; this.priceMin = ''; this.priceMax = ''; this.selectedAmenities = []; this.adults = 2; this.children = 0; this.clearSearchDates(); this.showToast('Filtros limpiados'); }
+  
   handleSendMessage() {
     if (!this.isLoggedIn) { this.openAuthModal('login'); this.isContactModalOpen = false; this.showToast('Inicia sesión para contactar al anfitrión'); return; }
     if (this.contactMessage.trim()) {
@@ -680,7 +802,14 @@ export class CatalogoComponent implements OnInit {
     if (this.selectedAmenities.includes(amenity)) this.selectedAmenities = this.selectedAmenities.filter(a => a !== amenity);
     else this.selectedAmenities.push(amenity);
   }
+
   handleApplyFilters() { this.isFiltrosOpen = false; this.showToast(`Filtros aplicados: ${this.filteredProperties.length} resultados`); }
   updateAdults(amount: number, event: Event) { event.stopPropagation(); this.adults = Math.max(1, this.adults + amount); }
   updateChildren(amount: number, event: Event) { event.stopPropagation(); this.children = Math.max(0, this.children + amount); }
+
+  get favoritePropertiesList() { return this.properties.filter(p => this.favorites.includes(p.id)); }
+  goToFavoritos() { this.isUserMenuOpen = false; this.activeView = 'favoritos'; window.scrollTo(0, 0); }
+  get misViajesList() { return this.reservasBase.filter(r => r.huesped === this.userName); }
+  getPropertyImage(id: number): string { const prop = this.properties.find(p => p.id === id); return prop ? prop.image : ''; }
+  goToMisViajes() { this.isUserMenuOpen = false; this.activeView = 'mis-viajes'; window.scrollTo(0, 0); }
 }
