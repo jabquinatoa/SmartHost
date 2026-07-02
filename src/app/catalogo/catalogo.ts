@@ -342,9 +342,14 @@ export class CatalogoComponent implements OnInit {
     { id: 2, propiedad: 'Loft Moderno Parque La Carolina', descripcion: 'Reposición sábanas', asignado: 'Juan', completada: false }
   ];
 
-  activeView: 'catalogo' | 'detalle' | 'admin' | 'favoritos' | 'mis-viajes' = 'catalogo';
+  activeView: 'catalogo' | 'detalle' | 'admin' | 'favoritos' | 'mis-viajes' | 'configuracion' = 'catalogo';
   selectedProperty: Property | null = null;
+  
+  // Variables del Toast Animado
   toastMsg: string | null = null;
+  toastState: 'entering' | 'leaving' | null = null;
+  toastTimeout: any;
+  leaveTimeout: any;
   
   activeFilter = 'Todos';
   favorites: number[] = [];
@@ -359,7 +364,6 @@ export class CatalogoComponent implements OnInit {
   monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   
-  // Modales de la Tarjeta de Reserva
   isDetailCalendarOpen = false;
   isDetailGuestOpen = false;
 
@@ -370,6 +374,8 @@ export class CatalogoComponent implements OnInit {
   priceMin = '';
   priceMax = '';
   selectedAmenities: string[] = [];
+  
+  // Auth & Session
   isAuthModalOpen = false;
   authMode: 'login' | 'register' = 'login';
   authEmail = '';
@@ -377,7 +383,18 @@ export class CatalogoComponent implements OnInit {
   authName = '';
   isLoggedIn = false;
   userName = '';
+  userEmail = '';
+  userPhone = '';
   contactMessage = '';
+
+  // Configuración de la cuenta
+  configTab: 'info' | 'seguridad' | 'notificaciones' = 'info';
+  currentPassword = '';
+  newPassword = '';
+  confirmPassword = '';
+  notifEmail = true;
+  notifSms = false;
+  notifPromos = true;
 
   filterOptions = ['Todos', 'Departamentos', 'Suites', 'Casas', 'Lofts'];
   filterAmenities = ['WiFi', 'Mascotas', 'Estacionamiento', 'Piscina', 'Cocina', 'Jacuzzi'];
@@ -511,7 +528,6 @@ export class CatalogoComponent implements OnInit {
       try {
         const parsed = JSON.parse(savedData);
         if (parsed.properties) {
-          // Hidratación: Asegurar que todas las propiedades tengan un arreglo de imágenes válido
           this.properties = parsed.properties.map((p: Property) => {
             if (!p.images || p.images.length < 3) {
               p.images = [
@@ -535,6 +551,8 @@ export class CatalogoComponent implements OnInit {
         if (parsed.propiedadesCalendario) this.propiedadesCalendario = parsed.propiedadesCalendario;
         if (parsed.isLoggedIn !== undefined) this.isLoggedIn = parsed.isLoggedIn;
         if (parsed.userName) this.userName = parsed.userName;
+        if (parsed.userEmail) this.userEmail = parsed.userEmail;
+        if (parsed.userPhone) this.userPhone = parsed.userPhone;
         if (parsed.adminNotificaciones) this.adminNotificaciones = parsed.adminNotificaciones;
         
         if (parsed.adminContactos) {
@@ -558,6 +576,8 @@ export class CatalogoComponent implements OnInit {
       adminContactos: this.adminContactos,
       isLoggedIn: this.isLoggedIn,
       userName: this.userName,
+      userEmail: this.userEmail,
+      userPhone: this.userPhone,
       adminNotificaciones: this.adminNotificaciones
     };
     localStorage.setItem('smartHostDB', JSON.stringify(dataToSave));
@@ -733,10 +753,29 @@ export class CatalogoComponent implements OnInit {
     });
   }
 
-  showToast(message: string) { this.toastMsg = message; setTimeout(() => this.toastMsg = null, 3000); }
+  showToast(message: string) {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    if (this.leaveTimeout) clearTimeout(this.leaveTimeout);
+    
+    this.toastMsg = message;
+    this.toastState = 'entering';
+    
+    this.toastTimeout = setTimeout(() => {
+      this.toastState = 'leaving';
+      this.leaveTimeout = setTimeout(() => {
+        this.toastMsg = null;
+        this.toastState = null;
+      }, 300); // Mismo tiempo que la clase duration-300 de Tailwind
+    }, 3000);
+  }
   
   toggleFavorite(event: Event, propertyId: number) {
     event.stopPropagation();
+    if (!this.isLoggedIn) {
+      this.openAuthModal('login');
+      this.showToast('Inicia sesión para guardar favoritos');
+      return;
+    }
     if (this.favorites.includes(propertyId)) { this.favorites = this.favorites.filter(id => id !== propertyId); this.showToast('Eliminado de favoritos'); }
     else { this.favorites.push(propertyId); this.showToast('Añadido a favoritos'); }
     this.saveData();
@@ -756,13 +795,78 @@ export class CatalogoComponent implements OnInit {
   }
 
   openAuthModal(mode: 'login' | 'register') { this.authMode = mode; this.isAuthModalOpen = true; }
+  
   handleAuth() {
-    this.isLoggedIn = true; this.userName = this.authMode === 'login' ? 'José' : (this.authName || 'Usuario');
+    if (this.authMode === 'register') {
+      if (!this.authName || !this.authEmail || !this.authPassword) {
+        this.showToast('Por favor completa todos los campos.'); return;
+      }
+      if (!this.authEmail.includes('@')) {
+        this.showToast('Ingresa un correo electrónico válido.'); return;
+      }
+      if (this.authPassword.length < 6) {
+        this.showToast('La contraseña debe tener al menos 6 caracteres.'); return;
+      }
+    } else {
+      if (!this.authEmail || !this.authPassword) {
+        this.showToast('Ingresa tus credenciales para continuar.'); return;
+      }
+      if (!this.authEmail.includes('@')) {
+        this.showToast('Ingresa un correo electrónico válido.'); return;
+      }
+    }
+
+    this.isLoggedIn = true; 
+    this.userName = this.authMode === 'login' ? (this.authEmail.split('@')[0] || 'José') : this.authName;
+    this.userEmail = this.authEmail;
     this.showToast(this.authMode === 'login' ? 'Sesión iniciada con éxito' : 'Cuenta creada con éxito');
-    this.isAuthModalOpen = false; this.authEmail = ''; this.authPassword = ''; this.authName = ''; this.saveData();
+    this.isAuthModalOpen = false; 
+    this.authEmail = ''; this.authPassword = ''; this.authName = ''; 
+    this.saveData();
   }
-  logout() { this.isLoggedIn = false; this.userName = ''; this.isUserMenuOpen = false; this.showToast('Sesión cerrada'); this.saveData(); }
-  showWipToast() { this.isUserMenuOpen = false; this.showToast('Esta función está en construcción 🚧'); }
+
+  logout() { 
+    this.isLoggedIn = false; 
+    this.userName = ''; 
+    this.userEmail = '';
+    this.userPhone = '';
+    this.favorites = []; 
+    this.isUserMenuOpen = false; 
+    this.activeView = 'catalogo'; 
+    this.showToast('Sesión cerrada exitosamente'); 
+    this.saveData(); 
+  }
+
+  goToConfiguracion() {
+    this.isUserMenuOpen = false;
+    this.configTab = 'info';
+    this.activeView = 'configuracion';
+    window.scrollTo(0, 0);
+  }
+
+  saveConfig() {
+    this.saveData();
+    this.showToast('Configuración guardada correctamente');
+  }
+
+  savePassword() {
+    if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
+      this.showToast('Por favor completa todos los campos de contraseña.');
+      return;
+    }
+    if (this.newPassword !== this.confirmPassword) {
+      this.showToast('Las contraseñas nuevas no coinciden.');
+      return;
+    }
+    if (this.newPassword.length < 6) {
+      this.showToast('La nueva contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+    this.showToast('Contraseña actualizada con éxito');
+    this.currentPassword = '';
+    this.newPassword = '';
+    this.confirmPassword = '';
+  }
 
   get dynamicNights() {
     if (!this.selDateIn || !this.selDateOut) return 1;
