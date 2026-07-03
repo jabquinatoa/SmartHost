@@ -34,6 +34,7 @@ interface TareaLimpieza {
   descripcion: string;
   asignado: string;
   completada: boolean;
+  diasNoDisponible: number;
 }
 
 interface ChatMessage {
@@ -62,6 +63,15 @@ interface Contacto {
   templateUrl: './catalogo.html'
 })
 export class CatalogoComponent implements OnInit {
+
+  // --- SISTEMA AUTOMÁTICO DE NOTIFICACIONES ANIMADAS ---
+  // Variables del Toast Animado
+  toastMsg: string | null = null;
+  toastState: string | null = null;
+  private toastTimeout: any;
+  private leaveTimeout: any;
+  // -------------------------------------------------------
+  
   
   properties: Property[] = [
     {
@@ -338,18 +348,15 @@ export class CatalogoComponent implements OnInit {
   ];
 
   tareasLimpieza: TareaLimpieza[] = [
-    { id: 1, propiedad: 'Suite Ejecutiva con Vista al Pichincha', descripcion: 'Limpieza profunda', asignado: 'María', completada: false },
-    { id: 2, propiedad: 'Loft Moderno Parque La Carolina', descripcion: 'Reposición sábanas', asignado: 'Juan', completada: false }
-  ];
+  { id: 1, propiedad: 'Suite Ejecutiva frente al CCI', descripcion: 'Limpieza profunda', asignado: 'María', completada: false, diasNoDisponible: 1 },
+  { id: 2, propiedad: 'Loft Moderno Parque La Carolina', descripcion: 'Reposición de sábanas', asignado: 'Juan', completada: false, diasNoDisponible: 1 }
+];
 
   activeView: 'catalogo' | 'detalle' | 'admin' | 'favoritos' | 'mis-viajes' | 'configuracion' = 'catalogo';
   selectedProperty: Property | null = null;
   
-  // Variables del Toast Animado
-  toastMsg: string | null = null;
-  toastState: 'entering' | 'leaving' | null = null;
-  toastTimeout: any;
-  leaveTimeout: any;
+// Variables del Toast Animado
+  
   
   activeFilter = 'Todos';
   favorites: number[] = [];
@@ -413,11 +420,14 @@ export class CatalogoComponent implements OnInit {
   adminPropertyForm = { id: 0, nombre: '', precio: '', descripcion: '', estado: 'Libre', imagen: '' };
   adminReservaSeleccionada: Reserva | null = null;
 
-  propiedadesCalendario = [
-    { id: 1, nombre: "Loft Moderno Parque La Carolina", diasOcupados: [3, 4, 5, 12, 13, 14, 15, 22, 23] },
-    { id: 2, nombre: "Casa Patrimonial Restaurada", diasOcupados: [1, 2, 8, 9, 10, 18, 19, 28, 29, 30] },
-    { id: 3, nombre: "Suite Ejecutiva con Vista al Pichincha", diasOcupados: [5, 6, 7, 15, 16, 17, 25, 26] },
-  ];
+
+  propiedadesCalendario: any[] = this.properties.map(p => ({
+    id: p.id,
+    nombre: p.name,
+    diasOcupados: [] 
+  }));
+
+
   adminMesActual: Date = new Date();
   adminDiasSeleccionados: number[] = [];
   adminPropiedadSeleccionadaId: number = 1;
@@ -522,49 +532,78 @@ export class CatalogoComponent implements OnInit {
 
   ngOnInit() { this.loadData(); }
 
-  loadData() {
-    const savedData = localStorage.getItem('smartHostDB');
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData);
-        if (parsed.properties) {
-          this.properties = parsed.properties.map((p: Property) => {
-            if (!p.images || p.images.length < 3) {
-              p.images = [
-                p.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop',
-                'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
-                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop'
-              ];
-            }
-            return p;
-          });
-        }
-        if (parsed.favorites) this.favorites = parsed.favorites;
-        if (parsed.reservasBase) {
-          this.reservasBase = parsed.reservasBase.map((r: any) => ({
-            ...r,
-            fechaCheckIn: new Date(r.fechaCheckIn),
-            fechaCheckOut: new Date(r.fechaCheckOut)
-          }));
-        }
-        if (parsed.tareasLimpieza) this.tareasLimpieza = parsed.tareasLimpieza;
-        if (parsed.propiedadesCalendario) this.propiedadesCalendario = parsed.propiedadesCalendario;
-        if (parsed.isLoggedIn !== undefined) this.isLoggedIn = parsed.isLoggedIn;
-        if (parsed.userName) this.userName = parsed.userName;
-        if (parsed.userEmail) this.userEmail = parsed.userEmail;
-        if (parsed.userPhone) this.userPhone = parsed.userPhone;
-        if (parsed.adminNotificaciones) this.adminNotificaciones = parsed.adminNotificaciones;
-        
-        if (parsed.adminContactos) {
-          this.adminContactos = parsed.adminContactos.map((c: any) => {
-            if (!c.chat) c.chat = [{ id: 1, texto: c.ultimo, enviado: false, hora: c.tiempo }];
-            return c;
-          });
-        }
-        if (this.adminContactos.length > 0) this.adminContactoActivo = this.adminContactos[0];
-      } catch (e) { console.error("Error al cargar datos locales", e); }
-    }
+  private mergeProperties(saved: any[]): Property[] {
+  // Parte de las propiedades por defecto del código y les aplica encima
+  // cualquier edición guardada (precio, estado, descripción, imagen)
+  const merged = this.properties.map(defaultProp => {
+    const savedProp = saved.find((sp: any) => sp.id === defaultProp.id);
+    return savedProp ? { ...defaultProp, ...savedProp } : defaultProp;
+  });
+  // Agrega propiedades nuevas creadas desde el panel de administrador
+  saved.forEach((sp: any) => {
+    if (!merged.find(p => p.id === sp.id)) merged.push(sp);
+  });
+  return merged;
+}
+
+loadData() {
+  const savedData = localStorage.getItem('smartHostDB');
+  if (savedData) {
+    try {
+      const parsed = JSON.parse(savedData);
+
+      if (parsed.properties) {
+        this.properties = this.mergeProperties(parsed.properties).map((p: Property) => {
+          if (!p.images || p.images.length < 3) {
+            p.images = [
+              p.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop',
+              'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
+              'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop'
+            ];
+          }
+          return p;
+        });
+      }
+
+      if (parsed.favorites) this.favorites = parsed.favorites;
+
+      if (parsed.reservasBase) {
+        this.reservasBase = parsed.reservasBase.map((r: any) => ({
+          ...r,
+          fechaCheckIn: new Date(r.fechaCheckIn),
+          fechaCheckOut: new Date(r.fechaCheckOut)
+        }));
+      }
+
+      if (parsed.tareasLimpieza) this.tareasLimpieza = parsed.tareasLimpieza;
+
+      // Reconstruye el calendario desde TODAS las propiedades actuales,
+      // conservando los días ya bloqueados si existían en el localStorage.
+      this.propiedadesCalendario = this.properties.map(p => {
+        const guardada = parsed.propiedadesCalendario?.find((pc: any) => pc.id === p.id);
+        return {
+          id: p.id,
+          nombre: p.name,
+          diasOcupados: guardada ? guardada.diasOcupados : []
+        };
+      });
+
+      if (parsed.isLoggedIn !== undefined) this.isLoggedIn = parsed.isLoggedIn;
+      if (parsed.userName) this.userName = parsed.userName;
+      if (parsed.userEmail) this.userEmail = parsed.userEmail;
+      if (parsed.userPhone) this.userPhone = parsed.userPhone;
+      if (parsed.adminNotificaciones) this.adminNotificaciones = parsed.adminNotificaciones;
+
+      if (parsed.adminContactos) {
+        this.adminContactos = parsed.adminContactos.map((c: any) => {
+          if (!c.chat) c.chat = [{ id: 1, texto: c.ultimo, enviado: false, hora: c.tiempo }];
+          return c;
+        });
+      }
+      if (this.adminContactos.length > 0) this.adminContactoActivo = this.adminContactos[0];
+    } catch (e) { console.error("Error al cargar datos locales", e); }
   }
+}
 
   saveData() {
     const dataToSave = {
@@ -595,10 +634,10 @@ export class CatalogoComponent implements OnInit {
   verDetallesReserva(res: Reserva) { this.adminReservaSeleccionada = res; }
   cerrarDetallesReserva() { this.adminReservaSeleccionada = null; }
   marcarLimpieza(tarea: TareaLimpieza) {
-    tarea.completada = !tarea.completada;
-    if (tarea.completada) this.showToast(`Limpieza de ${tarea.propiedad} completada`);
-    this.saveData();
-  }
+  tarea.completada = !tarea.completada;
+  this.showToast(tarea.completada ? `Limpieza de ${tarea.propiedad} completada` : `Tarea de ${tarea.propiedad} reabierta`);
+  this.saveData();
+}
 
   adminOpenNuevaPropiedad() {
     this.isEditingProperty = false;
@@ -753,19 +792,21 @@ export class CatalogoComponent implements OnInit {
     });
   }
 
-  showToast(message: string) {
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
-    if (this.leaveTimeout) clearTimeout(this.leaveTimeout);
-    
-    this.toastMsg = message;
-    this.toastState = 'entering';
-    
-    this.toastTimeout = setTimeout(() => {
+  showToast(mensaje: string) {
+    // El secreto aquí es usar 'window.' para forzar el temporizador del navegador
+    if (this.toastTimeout) { window.clearTimeout(this.toastTimeout); }
+    if (this.leaveTimeout) { window.clearTimeout(this.leaveTimeout); }
+
+    this.toastMsg = mensaje;
+    this.toastState = 'visible';
+
+    this.toastTimeout = window.setTimeout(() => {
       this.toastState = 'leaving';
-      this.leaveTimeout = setTimeout(() => {
+
+      this.leaveTimeout = window.setTimeout(() => {
         this.toastMsg = null;
         this.toastState = null;
-      }, 300); // Mismo tiempo que la clase duration-300 de Tailwind
+      }, 300);
     }, 3000);
   }
   
@@ -882,26 +923,54 @@ export class CatalogoComponent implements OnInit {
   }
 
   handleReservation() {
-    if (!this.isLoggedIn) { this.openAuthModal('login'); this.showToast('Inicia sesión para solicitar una reserva'); return; }
-    if (!this.selDateIn || !this.selDateOut || !this.selectedProperty) { this.showToast('Por favor selecciona las fechas de tu reserva'); return; }
-    
-    this.reservasBase.push({ 
-      id: Date.now(), 
-      propiedadId: this.selectedProperty.id, 
-      nombrePropiedad: this.selectedProperty.name, 
-      huesped: this.userName || 'Viajero', 
-      fechaCheckIn: this.selDateIn, 
-      fechaCheckOut: this.selDateOut, 
-      estado: 'Pendiente' 
-    });
-    
-    this.showToast('¡Reserva confirmada con éxito!');
-    this.clearSearchDates();
-    this.isDetailCalendarOpen = false;
-    this.isDetailGuestOpen = false;
-    this.saveData(); 
-    setTimeout(() => this.handleBackToCatalog(), 1500);
+  if (!this.isLoggedIn) { this.openAuthModal('login'); this.showToast('Inicia sesión para solicitar una reserva'); return; }
+  if (!this.selDateIn || !this.selDateOut || !this.selectedProperty) { this.showToast('Por favor selecciona las fechas de viaje'); return; }
+
+  // Guardamos referencias locales ya validadas (evita perder el narrowing de TS)
+  const property = this.selectedProperty;
+  const checkIn = this.selDateIn;
+  const checkOut = this.selDateOut;
+
+  // 1. Guardar la reserva para la vista del viajero
+  this.reservasBase.push({
+    id: Date.now(),
+    propiedadId: property.id,
+    nombrePropiedad: property.name,
+    huesped: this.userName || 'Viajero',
+    fechaCheckIn: checkIn,
+    fechaCheckOut: checkOut,
+    estado: 'Pendiente'
+  });
+
+  // 2. Bloquear los días en el calendario del administrador
+  const startDay = checkIn.getDate();
+  const endDay = checkOut.getDate();
+  const diasReservados: number[] = [];
+  for (let i = startDay; i < endDay; i++) { diasReservados.push(i); }
+
+  const propAdmin = this.propiedadesCalendario.find(p => p.id === property.id);
+  if (propAdmin) {
+    propAdmin.diasOcupados = [...new Set([...propAdmin.diasOcupados, ...diasReservados])];
   }
+
+  // 3. Crear la notificación con TODOS los campos que exige el tipo
+  this.adminNotificaciones.unshift({
+    id: Date.now(),
+    titulo: '¡Nueva Reserva!',
+    mensaje: `Reserva automática en ${property.name}`,
+    tiempo: 'ahora',
+    leida: false
+  });
+
+  // 4. Finalizar visualmente
+  this.showToast('¡Reserva confirmada con éxito!');
+  this.clearSearchDates();
+  this.isDetailCalendarOpen = false;
+  this.isDetailGuestOpen = false;
+  this.saveData();
+
+  setTimeout(() => this.handleBackToCatalog(), 1500);
+}
 
   clearAllFilters() { this.activeFilter = 'Todos'; this.selectedDestino = ''; this.priceMin = ''; this.priceMax = ''; this.selectedAmenities = []; this.adults = 2; this.children = 0; this.clearSearchDates(); this.showToast('Filtros limpiados'); }
   
