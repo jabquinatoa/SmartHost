@@ -22,10 +22,13 @@ interface Reserva {
   id: number;
   propiedadId: number;
   nombrePropiedad: string;
+  ubicacionPropiedad?: string;
+  imagenPropiedad?: string;
+  propiedadKey?: string;
   huesped: string;
   fechaCheckIn: Date;
   fechaCheckOut: Date;
-  estado: 'Check-in' | 'Check-out' | 'Pendiente';
+  estado: 'Check-in' | 'Check-out' | 'Pendiente' | 'Reserva con éxito';
 }
 
 interface TareaLimpieza {
@@ -47,14 +50,18 @@ interface ChatMessage {
 interface Contacto {
   id: number;
   nombre: string;
+  email: string;            // vincula el chat con el usuario logueado
   ultimo: string;
   tiempo: string;
-  noLeidos: number;
+  noLeidos: number;         // no leídos por el ANFITRIÓN
+  noLeidosViajero: number;  // no leídos por el VIAJERO
   propiedad: string;
+  propiedadId: number;      // para reencontrar el hilo al reservar/contactar
   imagen: string;
   fechas: string;
   chat: ChatMessage[];
 }
+
 
 @Component({
   selector: 'app-catalogo',
@@ -71,8 +78,8 @@ export class CatalogoComponent implements OnInit {
   private toastTimeout: any;
   private leaveTimeout: any;
   // -------------------------------------------------------
-  
-  
+
+
   properties: Property[] = [
     {
       id: 1,
@@ -348,18 +355,16 @@ export class CatalogoComponent implements OnInit {
   ];
 
   tareasLimpieza: TareaLimpieza[] = [
-  { id: 1, propiedad: 'Suite Ejecutiva frente al CCI', descripcion: 'Limpieza profunda', asignado: 'María', completada: false, diasNoDisponible: 1 },
-  { id: 2, propiedad: 'Loft Moderno Parque La Carolina', descripcion: 'Reposición de sábanas', asignado: 'Juan', completada: false, diasNoDisponible: 1 }
-];
+    { id: 1, propiedad: 'Suite Ejecutiva frente al CCI', descripcion: 'Limpieza profunda', asignado: 'María', completada: false, diasNoDisponible: 1 },
+    { id: 2, propiedad: 'Loft Moderno Parque La Carolina', descripcion: 'Reposición de sábanas', asignado: 'Juan', completada: false, diasNoDisponible: 1 }
+  ];
 
-  activeView: 'catalogo' | 'detalle' | 'admin' | 'favoritos' | 'mis-viajes' | 'configuracion' = 'catalogo';
+  // FIX: se agregó 'mensajes' para la nueva vista de chat del lado viajero
+  activeView: 'catalogo' | 'detalle' | 'favoritos' | 'mis-viajes' | 'configuracion' | 'mensajes' | 'admin' = 'catalogo';
   selectedProperty: Property | null = null;
-  
-// Variables del Toast Animado
-  
-  
+
   activeFilter = 'Todos';
-  favorites: number[] = [];
+  favorites: string[] = [];
   activeSearchTab: 'destino' | 'fechas' | 'huespedes' | null = null;
   selectedDestino = '';
   selDateIn: Date | null = null;
@@ -370,7 +375,7 @@ export class CatalogoComponent implements OnInit {
   baseMonth = new Date();
   monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-  
+
   isDetailCalendarOpen = false;
   isDetailGuestOpen = false;
 
@@ -381,7 +386,7 @@ export class CatalogoComponent implements OnInit {
   priceMin = '';
   priceMax = '';
   selectedAmenities: string[] = [];
-  
+
   // Auth & Session
   isAuthModalOpen = false;
   authMode: 'login' | 'register' = 'login';
@@ -393,6 +398,10 @@ export class CatalogoComponent implements OnInit {
   userEmail = '';
   userPhone = '';
   contactMessage = '';
+
+  // Chat del lado VIAJERO (vista 'mensajes') — NUEVO
+  contactoClienteActivo: Contacto | null = null;
+  clienteMensajeInput: string = '';
 
   // Configuración de la cuenta
   configTab: 'info' | 'seguridad' | 'notificaciones' = 'info';
@@ -424,7 +433,7 @@ export class CatalogoComponent implements OnInit {
   propiedadesCalendario: any[] = this.properties.map(p => ({
     id: p.id,
     nombre: p.name,
-    diasOcupados: [] 
+    diasOcupados: []
   }));
 
 
@@ -479,7 +488,7 @@ export class CatalogoComponent implements OnInit {
 
   adminSearchQuery = '';
   isAdminSearchOpen = false;
-  
+
   get adminSearchRes() {
     if (!this.adminSearchQuery.trim()) return [];
     const q = this.adminSearchQuery.toLowerCase();
@@ -512,12 +521,47 @@ export class CatalogoComponent implements OnInit {
   adminMensajesTab: 'chats' | 'resenas' = 'chats';
   adminMensajesBusqueda: string = "";
   adminMensajeInput: string = "";
-  
+
   adminContactos: Contacto[] = [
-    { id: 1, nombre: "Carlos Martinez", ultimo: "Gracias por la info!", tiempo: "10:40", noLeidos: 2, propiedad: "Loft Moderno Parque La Carolina", imagen: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&h=200&fit=crop", fechas: "15-18 Ene 2026", chat: [] }
+    {
+      id: 1, nombre: "Carlos Martinez", email: "carlos.martinez@email.com", ultimo: "Gracias por la info!", tiempo: "10:40", noLeidos: 2, noLeidosViajero: 0,
+      propiedad: "Loft Moderno Parque La Carolina", propiedadId: 1,
+      imagen: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&h=200&fit=crop", fechas: "15-18 Ene 2026",
+      chat: [
+        { id: 1, texto: "Hola, ¿el loft tiene estacionamiento incluido?", enviado: false, hora: "10:15" },
+        { id: 2, texto: "¡Hola Carlos! Sí, cuenta con un espacio de estacionamiento privado incluido.", enviado: true, hora: "10:22" },
+        { id: 3, texto: "Perfecto, ¿y el check-in es flexible?", enviado: false, hora: "10:35" },
+        { id: 4, texto: "Claro, desde las 3pm en adelante, con cerradura inteligente para llegada autónoma.", enviado: true, hora: "10:38" },
+        { id: 5, texto: "Gracias por la info!", enviado: false, hora: "10:40" }
+      ]
+    },
+    {
+      id: 2, nombre: "Familia Gómez", email: "familia.gomez@email.com", ultimo: "Nos vemos el jueves entonces", tiempo: "Ayer", noLeidos: 0, noLeidosViajero: 0,
+      propiedad: "Casa Patrimonial Restaurada", propiedadId: 2,
+      imagen: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=200&fit=crop", fechas: "5-10 Jul 2026",
+      chat: [
+        { id: 1, texto: "Buenas tardes, somos 6 personas ¿la casa tiene suficientes camas?", enviado: false, hora: "Ayer 16:02" },
+        { id: 2, texto: "¡Buenas! Sí, tiene capacidad para 6 huéspedes con habitaciones separadas.", enviado: true, hora: "Ayer 16:10" },
+        { id: 3, texto: "Nos vemos el jueves entonces", enviado: false, hora: "Ayer 16:12" }
+      ]
+    },
+    {
+      id: 3, nombre: "Roberto Díaz", email: "roberto.diaz@email.com", ultimo: "¿Podrían mejorar el WiFi para esa fecha?", tiempo: "Lun", noLeidos: 1, noLeidosViajero: 0,
+      propiedad: "Suite Ejecutiva frente al CCI", propiedadId: 3,
+      imagen: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=200&h=200&fit=crop", fechas: "20-22 Jul 2026",
+      chat: [
+        { id: 1, texto: "Necesito la suite para una videollamada de trabajo importante.", enviado: false, hora: "Lun 09:14" },
+        { id: 2, texto: "El WiFi de la suite es de fibra óptica de alta velocidad, ideal para eso.", enviado: true, hora: "Lun 09:30" },
+        { id: 3, texto: "¿Podrían mejorar el WiFi para esa fecha?", enviado: false, hora: "Lun 09:45" }
+      ]
+    }
   ];
-  adminContactoActivo = this.adminContactos[0];
-  
+
+  // FIX: esta propiedad se usaba en adminSeleccionarContacto(), adminEnviarMensaje() y
+  // loadData() pero nunca estaba declarada — el archivo no podía compilar. Se inicializa
+  // con el primer contacto de la lista, igual que hacía loadData() al cargar datos guardados.
+  adminContactoActivo: Contacto = this.adminContactos[0];
+
   adminResenas: any[] = [
     { id: 1, nombre: "Laura Mendez", propiedad: "Loft Moderno Parque La Carolina", rating: 5, texto: "Excelente ubicacion y muy limpio. Volveria sin duda!", fecha: "hace 2 dias" },
     { id: 2, nombre: "Roberto Diaz", propiedad: "Suite Ejecutiva con Vista al Pichincha", rating: 4, texto: "Muy comodo para viajes de trabajo. Solo falta mejor WiFi.", fecha: "hace 1 semana" }
@@ -530,80 +574,225 @@ export class CatalogoComponent implements OnInit {
   get totalMensajesNuevos() { return this.adminContactos.reduce((total, contacto) => total + contacto.noLeidos, 0); }
   get checkinsHoy() { return this.reservasBase; }
 
+  // Getters del lado VIAJERO para la vista 'mensajes' — NUEVO
+  get misContactos() {
+    return this.adminContactos.filter(c => this.userEmail !== '' && c.email === this.userEmail);
+  }
+  get totalMensajesNoLeidosCliente() {
+    return this.misContactos.reduce((total, c) => total + (c.noLeidosViajero || 0), 0);
+  }
+
   ngOnInit() { this.loadData(); }
 
-  private mergeProperties(saved: any[]): Property[] {
-  // Parte de las propiedades por defecto del código y les aplica encima
-  // cualquier edición guardada (precio, estado, descripción, imagen)
-  const merged = this.properties.map(defaultProp => {
-    const savedProp = saved.find((sp: any) => sp.id === defaultProp.id);
-    return savedProp ? { ...defaultProp, ...savedProp } : defaultProp;
-  });
-  // Agrega propiedades nuevas creadas desde el panel de administrador
-  saved.forEach((sp: any) => {
-    if (!merged.find(p => p.id === sp.id)) merged.push(sp);
-  });
-  return merged;
-}
+  private normalizarContacto(c: any): Contacto {
+    const prop = this.properties.find(p => p.id === c.propiedadId || p.name === c.propiedad);
+    const chatBase = Array.isArray(c.chat) ? c.chat : [];
+    const chat: ChatMessage[] = chatBase.map((m: any, index: number) => ({
+      id: m.id || index + 1,
+      texto: m.texto || '',
+      enviado: !!m.enviado,
+      hora: m.hora || c.tiempo || 'ahora'
+    })).filter((m: ChatMessage) => m.texto.trim() !== '');
 
-loadData() {
-  const savedData = localStorage.getItem('smartHostDB');
-  if (savedData) {
-    try {
-      const parsed = JSON.parse(savedData);
+    const ultimo = c.ultimo || (chat.length > 0 ? chat[chat.length - 1].texto : '');
+    const tiempo = c.tiempo || (chat.length > 0 ? chat[chat.length - 1].hora : 'ahora');
 
-      if (parsed.properties) {
-        this.properties = this.mergeProperties(parsed.properties).map((p: Property) => {
-          if (!p.images || p.images.length < 3) {
-            p.images = [
-              p.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop',
-              'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
-              'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop'
-            ];
-          }
-          return p;
-        });
-      }
+    if (chat.length === 0 && ultimo.trim() !== '') {
+      chat.push({ id: 1, texto: ultimo, enviado: false, hora: tiempo });
+    }
 
-      if (parsed.favorites) this.favorites = parsed.favorites;
-
-      if (parsed.reservasBase) {
-        this.reservasBase = parsed.reservasBase.map((r: any) => ({
-          ...r,
-          fechaCheckIn: new Date(r.fechaCheckIn),
-          fechaCheckOut: new Date(r.fechaCheckOut)
-        }));
-      }
-
-      if (parsed.tareasLimpieza) this.tareasLimpieza = parsed.tareasLimpieza;
-
-      // Reconstruye el calendario desde TODAS las propiedades actuales,
-      // conservando los días ya bloqueados si existían en el localStorage.
-      this.propiedadesCalendario = this.properties.map(p => {
-        const guardada = parsed.propiedadesCalendario?.find((pc: any) => pc.id === p.id);
-        return {
-          id: p.id,
-          nombre: p.name,
-          diasOcupados: guardada ? guardada.diasOcupados : []
-        };
-      });
-
-      if (parsed.isLoggedIn !== undefined) this.isLoggedIn = parsed.isLoggedIn;
-      if (parsed.userName) this.userName = parsed.userName;
-      if (parsed.userEmail) this.userEmail = parsed.userEmail;
-      if (parsed.userPhone) this.userPhone = parsed.userPhone;
-      if (parsed.adminNotificaciones) this.adminNotificaciones = parsed.adminNotificaciones;
-
-      if (parsed.adminContactos) {
-        this.adminContactos = parsed.adminContactos.map((c: any) => {
-          if (!c.chat) c.chat = [{ id: 1, texto: c.ultimo, enviado: false, hora: c.tiempo }];
-          return c;
-        });
-      }
-      if (this.adminContactos.length > 0) this.adminContactoActivo = this.adminContactos[0];
-    } catch (e) { console.error("Error al cargar datos locales", e); }
+    return {
+      id: Number(c.id) || Date.now(),
+      nombre: c.nombre || 'Viajero',
+      email: c.email || '',
+      ultimo,
+      tiempo,
+      noLeidos: Number(c.noLeidos) || 0,
+      noLeidosViajero: Number(c.noLeidosViajero) || 0,
+      propiedad: c.propiedad || prop?.name || 'Propiedad',
+      propiedadId: Number(c.propiedadId) || prop?.id || 0,
+      imagen: c.imagen || prop?.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&h=200&fit=crop',
+      fechas: c.fechas || 'Sin fechas',
+      chat
+    };
   }
-}
+
+  private mezclarContactosGuardados(saved: any[]): Contacto[] {
+    const contactosBase = this.adminContactos.map(c => this.normalizarContacto(c));
+    const contactosGuardados = saved.map(c => this.normalizarContacto(c));
+    const mezclados = [...contactosGuardados];
+
+    contactosBase.forEach(base => {
+      const existente = mezclados.find(c =>
+        c.id === base.id ||
+        (c.email !== '' && c.email === base.email && c.propiedadId === base.propiedadId) ||
+        (c.nombre === base.nombre && c.propiedad === base.propiedad)
+      );
+      if (!existente) {
+        mezclados.push(base);
+        return;
+      }
+
+      if (existente.chat.length < base.chat.length) {
+        const mensajesExtra = existente.chat.filter(m => !base.chat.some(b => b.texto === m.texto && b.hora === m.hora));
+        existente.chat = [...base.chat, ...mensajesExtra];
+        existente.ultimo = existente.chat[existente.chat.length - 1].texto;
+        existente.tiempo = existente.chat[existente.chat.length - 1].hora;
+      }
+      if (!existente.email) existente.email = base.email;
+      if (!existente.propiedadId) existente.propiedadId = base.propiedadId;
+      if (!existente.fechas || existente.fechas === 'Sin fechas') existente.fechas = base.fechas;
+      if (!existente.imagen) existente.imagen = base.imagen;
+    });
+
+    return mezclados;
+  }
+
+  private moverContactoArriba(contacto: Contacto) {
+    this.adminContactos = [contacto, ...this.adminContactos.filter(c => c.id !== contacto.id)];
+  }
+
+  private getPropertyKey(property: Property): string {
+    return `${property.id}|${property.name}|${property.location}`;
+  }
+
+  private findPropertyForReservation(reserva: Partial<Reserva>): Property | undefined {
+    if (reserva.propiedadKey) {
+      const [idRaw, name, location] = reserva.propiedadKey.split('|');
+      const id = Number(idRaw);
+      const exact = this.properties.find(p => p.id === id && p.name === name && p.location === location);
+      if (exact) return exact;
+    }
+
+    return this.properties.find(p => p.id === reserva.propiedadId && p.name === reserva.nombrePropiedad)
+      || this.properties.find(p => p.name === reserva.nombrePropiedad)
+      || this.properties.find(p => p.id === reserva.propiedadId);
+  }
+
+  private normalizarReserva(r: any): Reserva {
+    const fechaCheckIn = new Date(r.fechaCheckIn);
+    const fechaCheckOut = new Date(r.fechaCheckOut);
+    const prop = this.findPropertyForReservation({
+      propiedadId: Number(r.propiedadId),
+      nombrePropiedad: r.nombrePropiedad,
+      propiedadKey: r.propiedadKey
+    });
+
+    return {
+      id: Number(r.id) || Date.now(),
+      propiedadId: prop?.id || Number(r.propiedadId) || 0,
+      nombrePropiedad: prop?.name || r.nombrePropiedad || 'Propiedad reservada',
+      ubicacionPropiedad: prop?.location || r.ubicacionPropiedad || '',
+      imagenPropiedad: prop?.image || r.imagenPropiedad || '',
+      propiedadKey: prop ? this.getPropertyKey(prop) : r.propiedadKey,
+      huesped: r.huesped || 'Viajero',
+      fechaCheckIn,
+      fechaCheckOut,
+      estado: r.estado === 'Pendiente' ? 'Reserva con éxito' : (r.estado || 'Reserva con éxito')
+    };
+  }
+
+  private bloquearFechasReserva(property: Property, checkIn: Date, checkOut: Date, enfocarCalendario = true) {
+    let propAdmin = this.propiedadesCalendario.find(p => p.id === property.id || p.nombre === property.name);
+    if (!propAdmin) {
+      propAdmin = { id: property.id, nombre: property.name, diasOcupados: [] };
+      this.propiedadesCalendario.push(propAdmin);
+    }
+
+    const diasReservados: number[] = [];
+    const cursor = new Date(checkIn);
+    while (cursor < checkOut) {
+      diasReservados.push(cursor.getDate());
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    propAdmin.id = property.id;
+    propAdmin.nombre = property.name;
+    propAdmin.diasOcupados = [...new Set([...propAdmin.diasOcupados, ...diasReservados])].sort((a, b) => a - b);
+    if (enfocarCalendario) {
+      this.adminPropiedadSeleccionadaId = property.id;
+      this.adminMesActual = new Date(checkIn.getFullYear(), checkIn.getMonth(), 1);
+    }
+  }
+
+  private mergeProperties(saved: any[]): Property[] {
+    // Parte de las propiedades por defecto del código y les aplica encima
+    // cualquier edición guardada (precio, estado, descripción, imagen)
+    const merged = this.properties.map(defaultProp => {
+      const savedProp = saved.find((sp: any) => sp.id === defaultProp.id);
+      return savedProp ? { ...defaultProp, ...savedProp } : defaultProp;
+    });
+    // Agrega propiedades nuevas creadas desde el panel de administrador
+    saved.forEach((sp: any) => {
+      if (!merged.find(p => p.id === sp.id)) merged.push(sp);
+    });
+    return merged;
+  }
+
+  loadData() {
+    const savedData = localStorage.getItem('smartHostDB');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+
+        if (parsed.properties) {
+          this.properties = this.mergeProperties(parsed.properties).map((p: Property) => {
+            if (!p.images || p.images.length < 3) {
+              p.images = [
+                p.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop',
+                'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
+                'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop'
+              ];
+            }
+            return p;
+          });
+        }
+
+        if (parsed.favorites) {
+          this.favorites = parsed.favorites
+            .map((fav: any) => this.normalizeFavoriteKey(fav))
+            .filter((fav: string | null, index: number, arr: (string | null)[]) => fav !== null && arr.indexOf(fav) === index) as string[];
+        }
+
+        if (parsed.reservasBase) {
+          this.reservasBase = parsed.reservasBase.map((r: any) => this.normalizarReserva(r));
+        }
+
+        if (parsed.tareasLimpieza) this.tareasLimpieza = parsed.tareasLimpieza;
+
+        // Reconstruye el calendario desde TODAS las propiedades actuales,
+        // conservando los días ya bloqueados si existían en el localStorage.
+        this.propiedadesCalendario = this.properties.map(p => {
+          const guardada = parsed.propiedadesCalendario?.find((pc: any) => pc.id === p.id);
+          return {
+            id: p.id,
+            nombre: p.name,
+            diasOcupados: guardada ? guardada.diasOcupados : []
+          };
+        });
+
+        this.reservasBase.forEach(reserva => {
+          const prop = this.findPropertyForReservation(reserva);
+          if (prop && reserva.estado !== 'Check-out') {
+            this.bloquearFechasReserva(prop, reserva.fechaCheckIn, reserva.fechaCheckOut, false);
+          }
+        });
+
+        if (parsed.isLoggedIn !== undefined) this.isLoggedIn = parsed.isLoggedIn;
+        if (parsed.userName) this.userName = parsed.userName;
+        if (parsed.userEmail) this.userEmail = parsed.userEmail;
+        if (parsed.userPhone) this.userPhone = parsed.userPhone;
+        if (parsed.adminNotificaciones) this.adminNotificaciones = parsed.adminNotificaciones;
+
+        // Migración defensiva: completa contactos viejos y conserva las
+        // simulaciones base cuando localStorage trae una lista incompleta.
+        if (parsed.adminContactos) {
+          this.adminContactos = this.mezclarContactosGuardados(parsed.adminContactos);
+        }
+        if (this.adminContactos.length > 0) this.adminContactoActivo = this.adminContactos[0];
+      } catch (e) { console.error("Error al cargar datos locales", e); }
+    }
+  }
 
   saveData() {
     const dataToSave = {
@@ -630,14 +819,14 @@ loadData() {
       setTimeout(() => element.classList.remove('ring-2', 'ring-[#0055FF]'), 1500);
     }
   }
-  
+
   verDetallesReserva(res: Reserva) { this.adminReservaSeleccionada = res; }
   cerrarDetallesReserva() { this.adminReservaSeleccionada = null; }
   marcarLimpieza(tarea: TareaLimpieza) {
-  tarea.completada = !tarea.completada;
-  this.showToast(tarea.completada ? `Limpieza de ${tarea.propiedad} completada` : `Tarea de ${tarea.propiedad} reabierta`);
-  this.saveData();
-}
+    tarea.completada = !tarea.completada;
+    this.showToast(tarea.completada ? `Limpieza de ${tarea.propiedad} completada` : `Tarea de ${tarea.propiedad} reabierta`);
+    this.saveData();
+  }
 
   adminOpenNuevaPropiedad() {
     this.isEditingProperty = false;
@@ -662,7 +851,7 @@ loadData() {
         this.properties[index].price = parseFloat(this.adminPropertyForm.precio.replace('$', '')) || 0;
         this.properties[index].description = this.adminPropertyForm.descripcion;
         this.properties[index].estado = this.adminPropertyForm.estado;
-        if(this.adminPropertyForm.imagen) this.properties[index].image = this.adminPropertyForm.imagen;
+        if (this.adminPropertyForm.imagen) this.properties[index].image = this.adminPropertyForm.imagen;
       }
       this.showToast('Propiedad actualizada exitosamente');
     } else {
@@ -694,7 +883,7 @@ loadData() {
   goToAdminPanel() {
     this.isUserMenuOpen = false;
     this.showToast('Preparando tu panel de anfitrión...');
-    setTimeout(() => { this.activeView = 'admin'; this.adminView = 'inicio'; window.scrollTo(0, 0); }, 100); 
+    setTimeout(() => { this.activeView = 'admin'; this.adminView = 'inicio'; window.scrollTo(0, 0); }, 100);
   }
   exitAdminPanel() { this.activeView = 'catalogo'; this.showToast('Volviendo al modo viaje...'); }
   setAdminView(view: any) {
@@ -723,23 +912,89 @@ loadData() {
     if (index > -1) this.adminDiasSeleccionados.splice(index, 1);
     else this.adminDiasSeleccionados.push(dia);
   }
-  
+
   adminBloquearFechas() {
     if (this.adminDiasSeleccionados.length === 0) { this.showToast("Selecciona al menos un dia para bloquear"); return; }
     this.adminPropiedadSeleccionada.diasOcupados.push(...this.adminDiasSeleccionados);
     this.showToast(`Fechas bloqueadas: ${this.adminDiasSeleccionados.length} días en ${this.adminPropiedadSeleccionada.nombre}`);
     this.adminDiasSeleccionados = []; this.saveData();
   }
-  
+
   adminMesAnterior() { this.adminMesActual = new Date(this.adminMesActual.getFullYear(), this.adminMesActual.getMonth() - 1, 1); this.adminDiasSeleccionados = []; }
   adminMesSiguiente() { this.adminMesActual = new Date(this.adminMesActual.getFullYear(), this.adminMesActual.getMonth() + 1, 1); this.adminDiasSeleccionados = []; }
 
+  // ===== CHAT: lado ANFITRIÓN (panel admin) =====
   adminSeleccionarContacto(contacto: Contacto) { this.adminContactoActivo = contacto; contacto.noLeidos = 0; this.saveData(); }
+
   adminEnviarMensaje() {
     if (this.adminMensajeInput.trim()) {
       const horaActual = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
       this.adminContactoActivo.chat.push({ id: this.adminContactoActivo.chat.length + 1, texto: this.adminMensajeInput, enviado: true, hora: horaActual });
-      this.adminContactoActivo.ultimo = this.adminMensajeInput; this.adminContactoActivo.tiempo = "ahora"; this.adminMensajeInput = "";
+      this.adminContactoActivo.ultimo = this.adminMensajeInput;
+      this.adminContactoActivo.tiempo = "ahora";
+      this.adminContactoActivo.noLeidosViajero = (this.adminContactoActivo.noLeidosViajero || 0) + 1;
+      if (this.adminContactoActivo.email === this.userEmail) {
+        this.contactoClienteActivo = this.adminContactoActivo;
+      }
+      this.moverContactoArriba(this.adminContactoActivo);
+      this.adminMensajeInput = "";
+      this.saveData();
+    }
+  }
+
+  // ===== CHAT: hilo compartido cliente/anfitrión =====
+  // Reutilizado por handleSendMessage() y handleReservation() para que contactar
+  // y reservar terminen en el MISMO hilo (por email + propiedad) en vez de crear
+  // contactos sueltos cada vez.
+  private obtenerOCrearContacto(property: Property): Contacto {
+    let contacto = this.adminContactos.find(c => c.email === this.userEmail && c.propiedadId === property.id);
+    if (!contacto) {
+      contacto = {
+        id: Date.now(),
+        nombre: this.userName || 'Viajero',
+        email: this.userEmail,
+        ultimo: '',
+        tiempo: 'ahora',
+        noLeidos: 0,
+        noLeidosViajero: 0,
+        propiedad: property.name,
+        propiedadId: property.id,
+        imagen: property.image,
+        fechas: this.formattedSearchDates !== 'Agregar fechas' ? this.formattedSearchDates : 'Sin fechas',
+        chat: []
+      };
+      this.adminContactos.unshift(contacto);
+    }
+    return contacto;
+  }
+
+  // ===== CHAT: lado VIAJERO (vista 'mensajes') =====
+  goToMensajes() {
+    this.isUserMenuOpen = false;
+    if (!this.contactoClienteActivo || this.contactoClienteActivo.email !== this.userEmail) {
+      this.contactoClienteActivo = this.misContactos[0] || null;
+    }
+    this.activeView = 'mensajes';
+    window.scrollTo(0, 0);
+  }
+
+  clienteSeleccionarContacto(contacto: Contacto) {
+    this.contactoClienteActivo = contacto;
+    contacto.noLeidosViajero = 0;
+    this.saveData();
+  }
+
+  clienteEnviarMensaje() {
+    if (this.clienteMensajeInput.trim() && this.contactoClienteActivo) {
+      const hora = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+      this.contactoClienteActivo.chat.push({ id: this.contactoClienteActivo.chat.length + 1, texto: this.clienteMensajeInput, enviado: false, hora });
+      this.contactoClienteActivo.ultimo = this.clienteMensajeInput;
+      this.contactoClienteActivo.tiempo = "ahora";
+      this.contactoClienteActivo.noLeidos = (this.contactoClienteActivo.noLeidos || 0) + 1;
+      this.adminContactoActivo = this.contactoClienteActivo;
+      this.moverContactoArriba(this.contactoClienteActivo);
+      this.adminNotificaciones.unshift({ id: Date.now(), titulo: 'Nuevo Mensaje', mensaje: `${this.userName || 'Viajero'}: "${this.clienteMensajeInput}"`, tiempo: 'ahora', leida: false });
+      this.clienteMensajeInput = "";
       this.saveData();
     }
   }
@@ -809,34 +1064,61 @@ loadData() {
       }, 300);
     }, 3000);
   }
-  
-  toggleFavorite(event: Event, propertyId: number) {
+
+  private getFavoriteKey(property: Property): string {
+    return this.getPropertyKey(property);
+  }
+
+  private normalizeFavoriteKey(fav: any): string | null {
+    if (typeof fav === 'string' && fav.includes('|')) {
+      const [, name, location] = fav.split('|');
+      const property = this.properties.find(p => p.name === name && p.location === location);
+      return property ? this.getFavoriteKey(property) : null;
+    }
+
+    const propertyId = Number(fav);
+    const property = this.properties.find(p => p.id === propertyId);
+    return property ? this.getFavoriteKey(property) : null;
+  }
+
+  isFavorite(property: Property): boolean {
+    return this.favorites.includes(this.getFavoriteKey(property));
+  }
+
+  toggleFavorite(event: Event, property: Property) {
     event.stopPropagation();
     if (!this.isLoggedIn) {
       this.openAuthModal('login');
       this.showToast('Inicia sesión para guardar favoritos');
       return;
     }
-    if (this.favorites.includes(propertyId)) { this.favorites = this.favorites.filter(id => id !== propertyId); this.showToast('Eliminado de favoritos'); }
-    else { this.favorites.push(propertyId); this.showToast('Añadido a favoritos'); }
+
+    const favoriteKey = this.getFavoriteKey(property);
+    if (this.favorites.includes(favoriteKey)) {
+      this.favorites = this.favorites.filter(key => key !== favoriteKey);
+      this.showToast('Eliminado de favoritos');
+    } else {
+      this.favorites.push(favoriteKey);
+      this.showToast('Añadido a favoritos');
+    }
     this.saveData();
   }
 
-  handlePropertyClick(property: Property) { 
-    this.selectedProperty = property; 
-    this.activeView = 'detalle'; 
-    window.scrollTo(0, 0); 
+  handlePropertyClick(property: Property) {
+    this.selectedProperty = property;
+    this.activeView = 'detalle';
+    window.scrollTo(0, 0);
   }
 
-  handleBackToCatalog() { 
-    this.activeView = 'catalogo'; 
-    this.selectedProperty = null; 
-    this.isDetailCalendarOpen = false; 
+  handleBackToCatalog() {
+    this.activeView = 'catalogo';
+    this.selectedProperty = null;
+    this.isDetailCalendarOpen = false;
     this.isDetailGuestOpen = false;
   }
 
   openAuthModal(mode: 'login' | 'register') { this.authMode = mode; this.isAuthModalOpen = true; }
-  
+
   handleAuth() {
     if (this.authMode === 'register') {
       if (!this.authName || !this.authEmail || !this.authPassword) {
@@ -857,25 +1139,26 @@ loadData() {
       }
     }
 
-    this.isLoggedIn = true; 
+    this.isLoggedIn = true;
     this.userName = this.authMode === 'login' ? (this.authEmail.split('@')[0] || 'José') : this.authName;
     this.userEmail = this.authEmail;
     this.showToast(this.authMode === 'login' ? 'Sesión iniciada con éxito' : 'Cuenta creada con éxito');
-    this.isAuthModalOpen = false; 
-    this.authEmail = ''; this.authPassword = ''; this.authName = ''; 
+    this.isAuthModalOpen = false;
+    this.authEmail = ''; this.authPassword = ''; this.authName = '';
     this.saveData();
   }
 
-  logout() { 
-    this.isLoggedIn = false; 
-    this.userName = ''; 
+  logout() {
+    this.isLoggedIn = false;
+    this.userName = '';
     this.userEmail = '';
     this.userPhone = '';
-    this.favorites = []; 
-    this.isUserMenuOpen = false; 
-    this.activeView = 'catalogo'; 
-    this.showToast('Sesión cerrada exitosamente'); 
-    this.saveData(); 
+    this.favorites = [];
+    this.contactoClienteActivo = null;
+    this.isUserMenuOpen = false;
+    this.activeView = 'catalogo';
+    this.showToast('Sesión cerrada exitosamente');
+    this.saveData();
   }
 
   goToConfiguracion() {
@@ -917,76 +1200,94 @@ loadData() {
   get subtotal() { return this.selectedProperty ? this.selectedProperty.price * this.dynamicNights : 0; }
   get serviceFee() { return Math.round(this.subtotal * 0.12); }
   get total() { return this.subtotal + this.serviceFee; }
-  
-  formatIsoDate(d: Date | null): string { 
-    return !d ? 'Añadir fecha' : d.toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' }); 
+
+  formatIsoDate(d: Date | null): string {
+    return !d ? 'Añadir fecha' : d.toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   handleReservation() {
-  if (!this.isLoggedIn) { this.openAuthModal('login'); this.showToast('Inicia sesión para solicitar una reserva'); return; }
-  if (!this.selDateIn || !this.selDateOut || !this.selectedProperty) { this.showToast('Por favor selecciona las fechas de viaje'); return; }
+    if (!this.isLoggedIn) { this.openAuthModal('login'); this.showToast('Inicia sesión para solicitar una reserva'); return; }
+    if (!this.selDateIn || !this.selDateOut || !this.selectedProperty) { this.showToast('Por favor selecciona las fechas de viaje'); return; }
 
-  // Guardamos referencias locales ya validadas (evita perder el narrowing de TS)
-  const property = this.selectedProperty;
-  const checkIn = this.selDateIn;
-  const checkOut = this.selDateOut;
+    // Guardamos referencias locales ya validadas (evita perder el narrowing de TS)
+    const property = this.selectedProperty;
+    const checkIn = this.selDateIn;
+    const checkOut = this.selDateOut;
 
-  // 1. Guardar la reserva para la vista del viajero
-  this.reservasBase.push({
-    id: Date.now(),
-    propiedadId: property.id,
-    nombrePropiedad: property.name,
-    huesped: this.userName || 'Viajero',
-    fechaCheckIn: checkIn,
-    fechaCheckOut: checkOut,
-    estado: 'Pendiente'
-  });
+    // 1. Guardar la reserva para la vista del viajero
+    this.reservasBase.push({
+      id: Date.now(),
+      propiedadId: property.id,
+      nombrePropiedad: property.name,
+      ubicacionPropiedad: property.location,
+      imagenPropiedad: property.image,
+      propiedadKey: this.getPropertyKey(property),
+      huesped: this.userName || 'Viajero',
+      fechaCheckIn: checkIn,
+      fechaCheckOut: checkOut,
+      estado: 'Reserva con éxito'
+    });
 
-  // 2. Bloquear los días en el calendario del administrador
-  const startDay = checkIn.getDate();
-  const endDay = checkOut.getDate();
-  const diasReservados: number[] = [];
-  for (let i = startDay; i < endDay; i++) { diasReservados.push(i); }
+    // 2. Bloquear los días en el calendario del administrador
+    this.bloquearFechasReserva(property, checkIn, checkOut);
+    property.estado = 'Ocupado';
 
-  const propAdmin = this.propiedadesCalendario.find(p => p.id === property.id);
-  if (propAdmin) {
-    propAdmin.diasOcupados = [...new Set([...propAdmin.diasOcupados, ...diasReservados])];
+    // 3. Crear la notificación
+    this.adminNotificaciones.unshift({
+      id: Date.now(),
+      titulo: '¡Nueva Reserva!',
+      mensaje: `Reserva automática en ${property.name}`,
+      tiempo: 'ahora',
+      leida: false
+    });
+
+    // 4. Crear o continuar el chat con contexto de la reserva.
+    const contacto = this.obtenerOCrearContacto(property);
+    const horaActual = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+    const mensajeReserva = `Hola, solicité una reserva del ${this.formatIsoDate(checkIn)} al ${this.formatIsoDate(checkOut)} para ${property.name}.`;
+    const mensajeConfirmacion = `¡Reserva confirmada! Del ${this.formatIsoDate(checkIn)} al ${this.formatIsoDate(checkOut)}. Cualquier duda, escríbeme por aquí.`;
+    contacto.fechas = this.formattedSearchDates;
+    contacto.chat.push({ id: contacto.chat.length + 1, texto: mensajeReserva, enviado: false, hora: horaActual });
+    contacto.chat.push({ id: contacto.chat.length + 1, texto: mensajeConfirmacion, enviado: true, hora: horaActual });
+    contacto.ultimo = mensajeConfirmacion;
+    contacto.tiempo = 'ahora';
+    contacto.noLeidos = (contacto.noLeidos || 0) + 1;
+    contacto.noLeidosViajero = (contacto.noLeidosViajero || 0) + 1;
+    this.adminContactoActivo = contacto;
+    this.contactoClienteActivo = contacto;
+    this.moverContactoArriba(contacto);
+
+    // 5. Finalizar visualmente
+    this.showToast('¡Reserva confirmada con éxito!');
+    this.clearSearchDates();
+    this.isDetailCalendarOpen = false;
+    this.isDetailGuestOpen = false;
+    this.saveData();
+
+    setTimeout(() => this.handleBackToCatalog(), 1500);
   }
 
-  // 3. Crear la notificación con TODOS los campos que exige el tipo
-  this.adminNotificaciones.unshift({
-    id: Date.now(),
-    titulo: '¡Nueva Reserva!',
-    mensaje: `Reserva automática en ${property.name}`,
-    tiempo: 'ahora',
-    leida: false
-  });
-
-  // 4. Finalizar visualmente
-  this.showToast('¡Reserva confirmada con éxito!');
-  this.clearSearchDates();
-  this.isDetailCalendarOpen = false;
-  this.isDetailGuestOpen = false;
-  this.saveData();
-
-  setTimeout(() => this.handleBackToCatalog(), 1500);
-}
-
   clearAllFilters() { this.activeFilter = 'Todos'; this.selectedDestino = ''; this.priceMin = ''; this.priceMax = ''; this.selectedAmenities = []; this.adults = 2; this.children = 0; this.clearSearchDates(); this.showToast('Filtros limpiados'); }
-  
+
   handleSendMessage() {
     if (!this.isLoggedIn) { this.openAuthModal('login'); this.isContactModalOpen = false; this.showToast('Inicia sesión para contactar al anfitrión'); return; }
-    if (this.contactMessage.trim()) {
-      const nuevoContacto: Contacto = {
-        id: Date.now(), nombre: this.userName || 'Viajero Nuevo', ultimo: this.contactMessage, tiempo: "ahora", noLeidos: 1, propiedad: this.selectedProperty?.name || 'Consulta General',
-        imagen: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop', fechas: this.formattedSearchDates !== 'Agregar fechas' ? this.formattedSearchDates : 'Sin fechas',
-        chat: [{ id: 1, texto: this.contactMessage, enviado: false, hora: new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }) }]
-      };
-      this.adminContactos.unshift(nuevoContacto);
-      this.adminNotificaciones.unshift({ id: Date.now(), titulo: 'Nuevo Mensaje', mensaje: `${this.userName || 'Viajero'}: "${this.contactMessage}"`, tiempo: 'ahora', leida: false });
-      this.showToast('Mensaje enviado al anfitrión');
-      this.contactMessage = ''; this.isContactModalOpen = false; this.saveData();
-    }
+    if (!this.contactMessage.trim() || !this.selectedProperty) return;
+
+    const property = this.selectedProperty;
+    const contacto = this.obtenerOCrearContacto(property);
+    const hora = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+
+    contacto.chat.push({ id: contacto.chat.length + 1, texto: this.contactMessage, enviado: false, hora });
+    contacto.ultimo = this.contactMessage;
+    contacto.tiempo = 'ahora';
+    contacto.noLeidos = (contacto.noLeidos || 0) + 1;
+    this.adminContactoActivo = contacto;
+    this.contactoClienteActivo = contacto;
+    this.moverContactoArriba(contacto);
+
+    this.adminNotificaciones.unshift({ id: Date.now(), titulo: 'Nuevo Mensaje', mensaje: `${this.userName || 'Viajero'}: "${this.contactMessage}"`, tiempo: 'ahora', leida: false });
+    this.showToast('Mensaje enviado al anfitrión');
+    this.contactMessage = ''; this.isContactModalOpen = false; this.saveData();
   }
 
   toggleAmenity(amenity: string) {
@@ -998,9 +1299,27 @@ loadData() {
   updateAdults(amount: number, event: Event) { event.stopPropagation(); this.adults = Math.max(1, this.adults + amount); }
   updateChildren(amount: number, event: Event) { event.stopPropagation(); this.children = Math.max(0, this.children + amount); }
 
-  get favoritePropertiesList() { return this.properties.filter(p => this.favorites.includes(p.id)); }
+  get favoritePropertiesList() {
+    return this.favorites
+      .map(key => {
+        const [idRaw, name, location] = key.split('|');
+        const id = Number(idRaw);
+        return this.properties.find(p => p.id === id && p.name === name && p.location === location)
+          || this.properties.find(p => p.name === name && p.location === location);
+      })
+      .filter((property): property is Property => !!property);
+  }
   goToFavoritos() { this.isUserMenuOpen = false; this.activeView = 'favoritos'; window.scrollTo(0, 0); }
   get misViajesList() { return this.reservasBase.filter(r => r.huesped === this.userName); }
-  getPropertyImage(id: number): string { const prop = this.properties.find(p => p.id === id); return prop ? prop.image : ''; }
+  getReservationImage(viaje: Reserva): string {
+    const prop = this.findPropertyForReservation(viaje);
+    return viaje.imagenPropiedad || prop?.image || '';
+  }
+  getPropertyImage(id: number, nombrePropiedad?: string): string {
+    const prop = this.properties.find(p => p.id === id && (!nombrePropiedad || p.name === nombrePropiedad))
+      || this.properties.find(p => nombrePropiedad && p.name === nombrePropiedad)
+      || this.properties.find(p => p.id === id);
+    return prop ? prop.image : '';
+  }
   goToMisViajes() { this.isUserMenuOpen = false; this.activeView = 'mis-viajes'; window.scrollTo(0, 0); }
 }

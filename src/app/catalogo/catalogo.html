@@ -128,13 +128,17 @@
             </div>
             
             <div *ngIf="isUserMenuOpen" class="absolute top-[120%] right-0 w-56 bg-[#1A1A1A] border border-[#333333] rounded-2xl shadow-2xl z-50 overflow-hidden py-2 animate-in fade-in zoom-in-95">
-              <button (click)="goToMisViajes()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium">Mis viajes</button>
-              <button (click)="goToFavoritos()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium">Favoritos</button>
-              <hr class="border-[#333333] my-2">
-              <button (click)="goToAdminPanel()" class="w-full text-left px-5 py-3 text-sm text-[#0055FF] font-bold hover:bg-[#2a2a2a] lg:hidden transition-colors">Modo Anfitrión</button>
-              <button (click)="goToConfiguracion()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium">Configuración de cuenta</button>
-              <hr class="border-[#333333] my-2">
-              <button (click)="logout()" class="w-full text-left px-5 py-3 text-sm text-[#ff4444] hover:bg-[#2a2a2a] transition-colors font-medium">Cerrar sesión</button>
+               <button (click)="goToMisViajes()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium">Mis viajes</button>
+               <button (click)="goToMensajes()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium flex items-center justify-between">
+               <span>Mensajes</span>
+               <span *ngIf="totalMensajesNoLeidosCliente > 0" class="w-5 h-5 bg-[#e61e4d] rounded-full flex items-center justify-center text-[10px] text-white font-bold">{{ totalMensajesNoLeidosCliente }}</span>
+               </button>
+               <button (click)="goToFavoritos()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium">Favoritos</button>
+               <hr class="border-[#333333] my-2">
+               <button (click)="goToAdminPanel()" class="w-full text-left px-5 py-3 text-sm text-[#0055FF] font-bold hover:bg-[#2a2a2a] lg:hidden transition-colors">Modo Anfitrión</button>
+               <button (click)="goToConfiguracion()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium">Configuración de cuenta</button>
+               <hr class="border-[#333333] my-2">
+               <button (click)="logout()" class="w-full text-left px-5 py-3 text-sm text-[#ff4444] hover:bg-[#2a2a2a] transition-colors font-medium">Cerrar sesión</button>
             </div>
           </div>
         </div>
@@ -192,8 +196,8 @@
         </aside>
 
         <!-- CONTENIDO CENTRAL Y SCROLL -->
-        <main class="flex-1 bg-[#121212] rounded-[2rem] border border-[#333333] shadow-2xl relative flex flex-col min-w-0" [ngClass]="{'p-6 sm:p-8': activeView === 'catalogo' || activeView === 'favoritos' || activeView === 'mis-viajes' || activeView === 'configuracion', 'p-0': activeView === 'detalle'}">
-          
+        <main class="flex-1 bg-[#121212] rounded-[2rem] border border-[#333333] shadow-2xl relative flex flex-col min-w-0" 
+         [ngClass]="{'p-6 sm:p-8': activeView === 'catalogo' || activeView === 'favoritos' || activeView === 'mis-viajes' || activeView === 'configuracion', 'p-0': activeView === 'detalle' || activeView === 'mensajes'}">
           <div *ngIf="activeView === 'catalogo'" class="animate-in fade-in duration-300">
             <div class="lg:hidden flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide mb-6 border-b border-[#333333]">
               <button *ngFor="let filter of filterOptions" (click)="activeFilter = filter" [ngClass]="{'bg-[#0055FF] text-white': activeFilter === filter, 'bg-transparent text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': activeFilter !== filter}" class="px-5 py-2.5 rounded-full whitespace-nowrap transition-colors font-medium border border-[#333333]">{{ filter }}</button>
@@ -236,8 +240,8 @@
                       +{{ property.amenities.length - 3 }}
                     </div>
                   </div>
-                  <button (click)="toggleFavorite($event, property.id)" class="absolute top-5 right-5 p-2 rounded-full hover:scale-110 transition-transform z-10 bg-black/20 backdrop-blur-sm border border-white/10">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="{'fill-[#ff385c] stroke-[#ff385c]': favorites.includes(property.id), 'fill-black/40 stroke-white': !favorites.includes(property.id)}"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                  <button (click)="toggleFavorite($event, property)" class="absolute top-5 right-5 p-2 rounded-full hover:scale-110 transition-transform z-10 bg-black/20 backdrop-blur-sm border border-white/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="{'fill-[#ff385c] stroke-[#ff385c]': isFavorite(property), 'fill-black/40 stroke-white': !isFavorite(property)}"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                   </button>
                 </div>
                 <div class="px-2">
@@ -280,7 +284,7 @@
                     <span class="inline-block bg-[#0055FF] text-white text-[10px] font-bold px-2 py-1 rounded mb-2 w-fit uppercase tracking-wider shadow-lg">{{ property.type }}</span>
                     <p class="text-white font-medium mb-1">Capacidad: {{ property.capacity }} huéspedes</p>
                   </div>
-                  <button (click)="toggleFavorite($event, property.id)" class="absolute top-5 right-5 p-2 rounded-full hover:scale-110 transition-transform z-10 bg-black/20 backdrop-blur-sm border border-white/10">
+                  <button (click)="toggleFavorite($event, property)" class="absolute top-5 right-5 p-2 rounded-full hover:scale-110 transition-transform z-10 bg-black/20 backdrop-blur-sm border border-white/10">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fill-[#ff385c] stroke-[#ff385c]"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                   </button>
                 </div>
@@ -319,7 +323,7 @@
             <div *ngIf="misViajesList.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               <div *ngFor="let viaje of misViajesList" class="bg-[#1A1A1A] border border-[#333333] rounded-2xl overflow-hidden flex flex-col sm:flex-row shadow-lg hover:border-[#0055FF]/40 transition-colors">
                 <div class="w-full sm:w-40 h-48 sm:h-auto flex-shrink-0 relative">
-                  <img [src]="getPropertyImage(viaje.propiedadId)" class="absolute inset-0 w-full h-full object-cover" />
+                  <img [src]="getReservationImage(viaje)" class="absolute inset-0 w-full h-full object-cover" />
                 </div>
                 <div class="p-5 flex flex-col justify-center w-full">
                   <div class="flex items-start justify-between mb-3">
@@ -341,7 +345,7 @@
                     <span class="text-xs text-[#a0a0a0]">Estado:</span>
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-sm"
                           [ngClass]="{
-                            'bg-green-500/10 text-green-400 border border-green-500/20': viaje.estado === 'Check-in',
+                            'bg-green-500/10 text-green-400 border border-green-500/20': viaje.estado === 'Check-in' || viaje.estado === 'Reserva con éxito',
                             'bg-amber-500/10 text-amber-400 border border-amber-500/20': viaje.estado === 'Pendiente',
                             'bg-[#2a2a2a] text-[#a0a0a0] border border-[#333333]': viaje.estado === 'Check-out'
                           }">
@@ -352,6 +356,84 @@
               </div>
             </div>
           </div>
+
+
+          <!-- VISTA MENSAJES (LADO VIAJERO) -->
+<div *ngIf="activeView === 'mensajes'" class="animate-in fade-in duration-300 h-[calc(100vh-130px)] flex flex-col">
+  <div class="flex items-center gap-4 mb-6 flex-shrink-0 px-6 sm:px-8 pt-6 sm:pt-8">
+    <button (click)="handleBackToCatalog()" class="w-12 h-12 bg-[#0055FF] text-white hover:bg-[#0044CC] hover:scale-105 rounded-full shadow-[0_0_20px_rgba(0,85,255,0.3)] transition-all duration-300 flex items-center justify-center flex-shrink-0 group">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <h1 class="text-3xl font-bold text-white tracking-tight">Mis Mensajes</h1>
+  </div>
+
+  <div class="flex-1 flex flex-col lg:flex-row min-h-0 px-6 sm:px-8 pb-6 sm:pb-8">
+    <!-- Lista de conversaciones del viajero -->
+    <div class="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-[#333333] bg-[#1A1A1A] rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none flex flex-col lg:h-full flex-shrink-0">
+      <div class="flex-1 overflow-y-auto min-h-0 max-h-52 lg:max-h-none scrollbar-hide">
+        <button *ngFor="let contacto of misContactos" (click)="clienteSeleccionarContacto(contacto)" 
+                [ngClass]="{'bg-[#2a2a2a]': contactoClienteActivo?.id === contacto.id}" 
+                class="w-full p-4 flex items-start gap-3 hover:bg-[#2a2a2a]/50 transition-colors text-left border-b border-[#333333]/50 last:border-0">
+          <div class="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+            <img [src]="contacto.imagen" [alt]="contacto.propiedad" class="w-full h-full object-cover">
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-bold text-white text-sm truncate">{{ contacto.propiedad }}</span>
+              <span class="text-[10px] text-[#a0a0a0]">{{ contacto.tiempo }}</span>
+            </div>
+            <p class="text-xs text-[#a0a0a0] truncate">{{ contacto.ultimo }}</p>
+          </div>
+          <span *ngIf="contacto.noLeidosViajero > 0" class="w-5 h-5 bg-[#e61e4d] rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow-lg">{{ contacto.noLeidosViajero }}</span>
+        </button>
+        <div *ngIf="misContactos.length === 0" class="p-8 text-center text-[#a0a0a0] text-sm">
+          No tienes conversaciones aún. Reserva o contacta a un anfitrión para empezar a chatear.
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de chat -->
+    <div class="flex-1 flex flex-col min-h-0 bg-[#121212] border border-t-0 lg:border-t lg:border-l-0 border-[#333333] rounded-b-2xl lg:rounded-r-2xl lg:rounded-bl-none">
+      <ng-container *ngIf="contactoClienteActivo; else sinChatSeleccionado">
+        <div class="p-4 border-b border-[#333333] flex items-center gap-4 flex-shrink-0 bg-[#1A1A1A] rounded-tr-2xl">
+          <div class="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+            <img [src]="contactoClienteActivo.imagen" [alt]="contactoClienteActivo.propiedad" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <h3 class="font-bold text-white">{{ contactoClienteActivo.propiedad }}</h3>
+            <p class="text-sm text-[#0055FF] font-medium">{{ contactoClienteActivo.fechas }}</p>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+          <div *ngFor="let msg of contactoClienteActivo.chat" class="flex" [ngClass]="!msg.enviado ? 'justify-end' : 'justify-start'">
+            <div class="max-w-[75%] px-5 py-3 rounded-2xl shadow-md" [ngClass]="!msg.enviado ? 'bg-[#0055FF] text-white rounded-br-sm' : 'bg-[#2a2a2a] text-white rounded-bl-sm border border-[#333333]'">
+              <p class="text-[15px] leading-relaxed">{{ msg.texto }}</p>
+              <p class="text-[10px] mt-1.5 opacity-70" [ngClass]="!msg.enviado ? 'text-right' : 'text-left'">{{ msg.hora }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-[#333333] flex-shrink-0 bg-[#1A1A1A] rounded-br-2xl">
+          <div class="flex gap-3">
+            <input type="text" [(ngModel)]="clienteMensajeInput" (keydown.enter)="clienteEnviarMensaje()" placeholder="Escribe un mensaje..." class="flex-1 px-5 py-3.5 bg-[#121212] border border-[#333333] rounded-xl text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#0055FF] transition-colors text-sm">
+            <button (click)="clienteEnviarMensaje()" class="px-6 py-3.5 bg-[#0055FF] text-white rounded-xl font-bold hover:bg-[#0044CC] transition-colors flex items-center gap-2 shadow-lg shadow-blue-900/20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+              <span class="hidden sm:inline">Enviar</span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #sinChatSeleccionado>
+        <div class="flex-1 flex items-center justify-center text-[#a0a0a0] text-sm p-8 text-center">
+          Selecciona una conversación para ver los mensajes.
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+
           <!-- VISTA DETALLE DE PROPIEDAD -->
           <div *ngIf="activeView === 'detalle' && selectedProperty" class="relative animate-in slide-in-from-right-4 duration-300 h-full p-6 sm:p-8">
             
@@ -943,7 +1025,7 @@
             <p class="text-white font-semibold text-sm truncate">{{ res.huesped }}</p>
             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold flex-shrink-0 whitespace-nowrap"
                   [ngClass]="{
-                    'bg-green-500/10 text-green-400': res.estado === 'Check-in',
+                    'bg-green-500/10 text-green-400': res.estado === 'Check-in' || res.estado === 'Reserva con éxito',
                     'bg-red-500/10 text-red-400': res.estado === 'Check-out',
                     'bg-amber-500/10 text-amber-400': res.estado === 'Pendiente'
                   }">
@@ -1279,7 +1361,7 @@
               <p class="text-[11px] font-bold text-[#a0a0a0] uppercase tracking-wider mb-2">Estado Actual</p>
               <span class="px-4 py-1.5 rounded-full text-sm font-bold shadow-md inline-block"
                     [ngClass]="{
-                      'bg-green-500/10 text-green-400': adminReservaSeleccionada.estado === 'Check-in',
+                      'bg-green-500/10 text-green-400': adminReservaSeleccionada.estado === 'Check-in' || adminReservaSeleccionada.estado === 'Reserva con éxito',
                       'bg-red-500/10 text-red-400': adminReservaSeleccionada.estado === 'Check-out',
                       'bg-amber-500/10 text-amber-400': adminReservaSeleccionada.estado === 'Pendiente'
                     }">
