@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: smarthost
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  users-service:
+    build:
+      context: ./backend-users
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=secretpassword
+      - DB_NAME=smarthost
+      - DB_PORT=5432
+    depends_on:
+      - db
+    volumes:
+      - ./backend-users:/app
+
+  core-service:
+    build:
+      context: ./backend-core
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=secretpassword
+      - DB_NAME=smarthost
+      - DB_PORT=5432
+    depends_on:
+      - db
+    volumes:
+      - ./backend-core:/app
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

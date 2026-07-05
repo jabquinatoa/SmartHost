@@ -192,6 +192,10 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
               <span>Notificaciones</span>
             </button>
+            <button (click)="configTab = 'pagos'" [ngClass]="{'bg-[#0055FF] text-white shadow-lg shadow-blue-900/20 font-bold': configTab === 'pagos', 'text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white font-medium': configTab !== 'pagos'}" class="w-full flex items-center gap-3 px-5 py-3 rounded-xl text-left transition-all flex-shrink-0 whitespace-nowrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              <span>Métodos de Pago</span>
+            </button>
           </nav>
         </aside>
 
@@ -341,16 +345,23 @@
                       <span class="text-white font-medium">{{ viaje.fechaCheckOut | date:'dd MMM, yyyy' }}</span>
                     </div>
                   </div>
-                  <div class="mt-auto pt-4 border-t border-[#333333] flex justify-between items-center">
-                    <span class="text-xs text-[#a0a0a0]">Estado:</span>
-                    <span class="px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                          [ngClass]="{
-                            'bg-green-500/10 text-green-400 border border-green-500/20': viaje.estado === 'Check-in' || viaje.estado === 'Reserva con éxito',
-                            'bg-amber-500/10 text-amber-400 border border-amber-500/20': viaje.estado === 'Pendiente',
-                            'bg-[#2a2a2a] text-[#a0a0a0] border border-[#333333]': viaje.estado === 'Check-out'
-                          }">
-                      {{ viaje.estado }}
-                    </span>
+                  <div class="mt-auto pt-4 border-t border-[#333333] flex flex-col gap-3">
+                    <div class="flex justify-start">
+                      <span class="px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-sm inline-block text-center w-full"
+                            [ngClass]="{
+                              'bg-green-500/10 text-green-400 border border-green-500/20': viaje.estado === 'Check-in' || viaje.estado === 'Reserva con éxito',
+                              'bg-amber-500/10 text-amber-400 border border-amber-500/20': viaje.estado === 'Pendiente',
+                              'bg-[#2a2a2a] text-[#a0a0a0] border border-[#333333]': viaje.estado === 'Check-out',
+                              'bg-red-500/10 text-red-400 border border-red-500/20': viaje.estado === 'Cancelada'
+                            }">
+                        {{ viaje.estado }}
+                      </span>
+                    </div>
+                    <button *ngIf="viaje.estado === 'Pendiente' || viaje.estado === 'Reserva con éxito'" 
+                            (click)="abrirModalCancelacion(viaje)"
+                            class="w-full text-sm font-bold text-red-400 bg-red-500/10 hover:bg-red-500/20 py-2.5 rounded-xl transition-all shadow-[0_0_10px_rgba(248,113,113,0.1)]">
+                      Cancelar Reserva
+                    </button>
                   </div>
                 </div>
               </div>
@@ -359,17 +370,16 @@
 
 
           <!-- VISTA MENSAJES (LADO VIAJERO) -->
-<div *ngIf="activeView === 'mensajes'" class="animate-in fade-in duration-300 h-[calc(100vh-130px)] flex flex-col">
-  <div class="flex items-center gap-4 mb-6 flex-shrink-0 px-6 sm:px-8 pt-6 sm:pt-8">
-    <button (click)="handleBackToCatalog()" class="w-12 h-12 bg-[#0055FF] text-white hover:bg-[#0044CC] hover:scale-105 rounded-full shadow-[0_0_20px_rgba(0,85,255,0.3)] transition-all duration-300 flex items-center justify-center flex-shrink-0 group">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
-    </button>
-    <h1 class="text-3xl font-bold text-white tracking-tight">Mis Mensajes</h1>
-  </div>
-
-  <div class="flex-1 flex flex-col lg:flex-row min-h-0 px-6 sm:px-8 pb-6 sm:pb-8">
+<div *ngIf="activeView === 'mensajes'" class="animate-in fade-in duration-300 h-[calc(100vh-140px)] flex flex-col">
+  <div class="flex-1 flex flex-col lg:flex-row min-h-0">
     <!-- Lista de conversaciones del viajero -->
-    <div class="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-[#333333] bg-[#1A1A1A] rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none flex flex-col lg:h-full flex-shrink-0">
+    <div class="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-[#333333] bg-[#1A1A1A] rounded-t-[2rem] lg:rounded-l-[2rem] lg:rounded-tr-none flex flex-col lg:h-full flex-shrink-0">
+      <div class="flex items-center gap-3 flex-shrink-0 px-6 py-6 border-b border-[#333333]/50">
+        <button (click)="handleBackToCatalog()" class="w-10 h-10 bg-[#0055FF] text-white hover:bg-[#0044CC] hover:scale-105 rounded-full shadow-[0_0_20px_rgba(0,85,255,0.3)] transition-all duration-300 flex items-center justify-center flex-shrink-0 group">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <h1 class="text-xl font-bold text-white tracking-tight">Mis Mensajes</h1>
+      </div>
       <div class="flex-1 overflow-y-auto min-h-0 max-h-52 lg:max-h-none scrollbar-hide">
         <button *ngFor="let contacto of misContactos" (click)="clienteSeleccionarContacto(contacto)" 
                 [ngClass]="{'bg-[#2a2a2a]': contactoClienteActivo?.id === contacto.id}" 
@@ -382,7 +392,7 @@
               <span class="font-bold text-white text-sm truncate">{{ contacto.propiedad }}</span>
               <span class="text-[10px] text-[#a0a0a0]">{{ contacto.tiempo }}</span>
             </div>
-            <p class="text-xs text-[#a0a0a0] truncate">{{ contacto.ultimo }}</p>
+            <p class="text-xs text-[#a0a0a0] truncate">{{ getUltimoMensajeViajero(contacto) }}</p>
           </div>
           <span *ngIf="contacto.noLeidosViajero > 0" class="w-5 h-5 bg-[#e61e4d] rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow-lg">{{ contacto.noLeidosViajero }}</span>
         </button>
@@ -393,9 +403,9 @@
     </div>
 
     <!-- Panel de chat -->
-    <div class="flex-1 flex flex-col min-h-0 bg-[#121212] border border-t-0 lg:border-t lg:border-l-0 border-[#333333] rounded-b-2xl lg:rounded-r-2xl lg:rounded-bl-none">
+    <div class="flex-1 flex flex-col min-h-0 bg-[#121212] border border-t-0 lg:border-t lg:border-l-0 border-[#333333] rounded-b-[2rem] lg:rounded-r-[2rem] lg:rounded-bl-none">
       <ng-container *ngIf="contactoClienteActivo; else sinChatSeleccionado">
-        <div class="p-4 border-b border-[#333333] flex items-center gap-4 flex-shrink-0 bg-[#1A1A1A] rounded-tr-2xl">
+        <div class="p-4 border-b border-[#333333] flex items-center gap-4 flex-shrink-0 bg-[#1A1A1A] rounded-tr-[2rem]">
           <div class="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
             <img [src]="contactoClienteActivo.imagen" [alt]="contactoClienteActivo.propiedad" class="w-full h-full object-cover">
           </div>
@@ -406,15 +416,17 @@
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
-          <div *ngFor="let msg of contactoClienteActivo.chat" class="flex" [ngClass]="!msg.enviado ? 'justify-end' : 'justify-start'">
-            <div class="max-w-[75%] px-5 py-3 rounded-2xl shadow-md" [ngClass]="!msg.enviado ? 'bg-[#0055FF] text-white rounded-br-sm' : 'bg-[#2a2a2a] text-white rounded-bl-sm border border-[#333333]'">
-              <p class="text-[15px] leading-relaxed">{{ msg.texto }}</p>
-              <p class="text-[10px] mt-1.5 opacity-70" [ngClass]="!msg.enviado ? 'text-right' : 'text-left'">{{ msg.hora }}</p>
+          <ng-container *ngFor="let msg of contactoClienteActivo.chat">
+            <div *ngIf="!msg.soloAnfitrion" class="flex" [ngClass]="!msg.enviado ? 'justify-end' : 'justify-start'">
+              <div class="max-w-[75%] px-5 py-3 rounded-2xl shadow-md" [ngClass]="!msg.enviado ? 'bg-[#0055FF] text-white rounded-br-sm' : 'bg-[#2a2a2a] text-white rounded-bl-sm border border-[#333333]'">
+                <p class="text-[15px] leading-relaxed">{{ msg.texto }}</p>
+                <p class="text-[10px] mt-1.5 opacity-70" [ngClass]="!msg.enviado ? 'text-right' : 'text-left'">{{ msg.hora }}</p>
+              </div>
             </div>
-          </div>
+          </ng-container>
         </div>
 
-        <div class="p-4 border-t border-[#333333] flex-shrink-0 bg-[#1A1A1A] rounded-br-2xl">
+        <div class="p-4 border-t border-[#333333] flex-shrink-0 bg-[#1A1A1A] rounded-br-[2rem]">
           <div class="flex gap-3">
             <input type="text" [(ngModel)]="clienteMensajeInput" (keydown.enter)="clienteEnviarMensaje()" placeholder="Escribe un mensaje..." class="flex-1 px-5 py-3.5 bg-[#121212] border border-[#333333] rounded-xl text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#0055FF] transition-colors text-sm">
             <button (click)="clienteEnviarMensaje()" class="px-6 py-3.5 bg-[#0055FF] text-white rounded-xl font-bold hover:bg-[#0044CC] transition-colors flex items-center gap-2 shadow-lg shadow-blue-900/20">
@@ -652,6 +664,7 @@
               <button (click)="configTab = 'info'" [ngClass]="{'bg-[#0055FF] text-white': configTab === 'info', 'bg-transparent text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': configTab !== 'info'}" class="px-5 py-2.5 rounded-full whitespace-nowrap transition-colors font-medium border border-[#333333]">Información</button>
               <button (click)="configTab = 'seguridad'" [ngClass]="{'bg-[#0055FF] text-white': configTab === 'seguridad', 'bg-transparent text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': configTab !== 'seguridad'}" class="px-5 py-2.5 rounded-full whitespace-nowrap transition-colors font-medium border border-[#333333]">Seguridad</button>
               <button (click)="configTab = 'notificaciones'" [ngClass]="{'bg-[#0055FF] text-white': configTab === 'notificaciones', 'bg-transparent text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': configTab !== 'notificaciones'}" class="px-5 py-2.5 rounded-full whitespace-nowrap transition-colors font-medium border border-[#333333]">Notificaciones</button>
+              <button (click)="configTab = 'pagos'" [ngClass]="{'bg-[#0055FF] text-white': configTab === 'pagos', 'bg-transparent text-[#a0a0a0] hover:bg-[#2a2a2a] hover:text-white': configTab !== 'pagos'}" class="px-5 py-2.5 rounded-full whitespace-nowrap transition-colors font-medium border border-[#333333]">Pagos</button>
             </div>
 
             <!-- CONTENEDOR CENTRAL DE LA CONFIGURACIÓN -->
@@ -737,6 +750,54 @@
                 </div>
                 <div class="mt-8 flex justify-end">
                   <button (click)="saveConfig()" class="px-8 py-3.5 bg-white text-black rounded-xl font-bold shadow-lg hover:bg-gray-200 transition-colors w-full sm:w-auto">Guardar preferencias</button>
+                </div>
+              </div>
+
+              <!-- Pestaña: MÉTODOS DE PAGO -->
+              <div *ngIf="configTab === 'pagos'" class="animate-in fade-in zoom-in-95 duration-200 w-full">
+                <div class="flex items-center justify-between mb-8">
+                  <div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Métodos de Pago</h3>
+                    <p class="text-[#a0a0a0]">Administra tus cuentas bancarias o DeUna para recibir pagos.</p>
+                  </div>
+                  <button (click)="openPagoForm()" class="bg-[#0055FF] hover:bg-[#0044CC] text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-lg shadow-blue-900/20 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    Nuevo
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div *ngFor="let pago of metodosPago" class="bg-[#121212] border border-[#333333] rounded-2xl p-5 hover:border-[#666] transition-colors relative group">
+                    <div class="flex justify-between items-start mb-3">
+                      <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-[#1A1A1A] flex items-center justify-center border border-[#333333]">
+                          <svg *ngIf="pago.tipo === 'Transferencia Bancaria'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0055FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                          <svg *ngIf="pago.tipo === 'DeUna'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                          <svg *ngIf="pago.tipo === 'Tarjeta'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                        </div>
+                        <div>
+                          <p class="text-white font-bold">{{ pago.tipo }}</p>
+                          <p class="text-[#a0a0a0] text-xs">{{ pago.banco || pago.titular }}</p>
+                        </div>
+                      </div>
+                      <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                        <button (click)="openPagoForm(pago)" class="text-[#a0a0a0] hover:text-white p-1.5 bg-[#1A1A1A] rounded-md border border-[#333333]">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        </button>
+                        <button (click)="deletePago(pago.id)" class="text-red-400 hover:text-red-300 p-1.5 bg-red-950/30 rounded-md border border-red-900/50">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-[#222]">
+                      <p class="text-white font-mono tracking-wide text-sm">{{ pago.cuenta || pago.celular || '**** **** **** ****' }}</p>
+                      <p class="text-[#666] text-xs mt-1">{{ pago.titular }}</p>
+                    </div>
+                  </div>
+                  
+                  <div *ngIf="metodosPago.length === 0" class="col-span-full py-12 text-center text-[#a0a0a0] border border-dashed border-[#333] rounded-2xl">
+                    <p>No tienes métodos de pago configurados.</p>
+                  </div>
                 </div>
               </div>
 
@@ -988,25 +1049,36 @@
         
         <div *ngIf="adminView === 'inicio'" class="space-y-8 animate-in fade-in flex-1">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl hover:border-[#0055FF]/30 transition-colors">
-              <div class="w-10 h-10 rounded-xl bg-[#1a2b4c] flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4dabf7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
-              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Ocupación General</p><h3 class="text-3xl font-bold text-white mb-4">{{ ocupacionPorcentajeGeneral }}%</h3>
-              <button (click)="setAdminView('propiedades')" class="text-[#0055FF] text-sm font-semibold hover:underline">Ver detalles</button>
+            <div class="bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#333333] rounded-2xl p-6 shadow-xl hover:border-[#0055FF]/50 hover:shadow-blue-900/10 transition-all hover:-translate-y-1 relative overflow-hidden group cursor-pointer" (click)="setAdminView('propiedades')">
+              <div class="absolute inset-0 bg-gradient-to-br from-[#0055FF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4dabf7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Ocupación General</p>
+              <h3 class="text-3xl font-black text-white mb-4">{{ ocupacionPorcentajeGeneral }}%</h3>
+              <div class="text-[#0055FF] text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">Ver detalles <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
             </div>
-            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl hover:border-[#0055FF]/30 transition-colors">
-              <div class="w-10 h-10 rounded-xl bg-[#1a2b4c] flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4dabf7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg></div>
-              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Reservas del Mes</p><h3 class="text-3xl font-bold text-white mb-4">{{ totalReservasMes }}</h3>
-              <button (click)="setAdminView('calendario')" class="text-[#0055FF] text-sm font-semibold hover:underline">Ver detalles</button>
+            
+            <div class="bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#333333] rounded-2xl p-6 shadow-xl hover:border-[#0055FF]/50 hover:shadow-blue-900/10 transition-all hover:-translate-y-1 relative overflow-hidden group cursor-pointer" (click)="setAdminView('calendario')">
+              <div class="absolute inset-0 bg-gradient-to-br from-[#0055FF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg></div>
+              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Reservas del Mes</p>
+              <h3 class="text-3xl font-black text-white mb-4">{{ totalReservasMes }}</h3>
+              <div class="text-[#0055FF] text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">Ver detalles <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
             </div>
-            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl hover:border-[#0055FF]/30 transition-colors">
-              <div class="w-10 h-10 rounded-xl bg-[#33251a] flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fcc419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></div>
-              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Limpiezas Pendientes</p><h3 class="text-3xl font-bold text-white mb-4">{{ totalLimpiezasPendientes }}</h3>
-              <button (click)="scrollToLimpiezas()" class="text-[#0055FF] text-sm font-semibold hover:underline">Ver detalles</button>
+            
+            <div class="bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#333333] rounded-2xl p-6 shadow-xl hover:border-amber-500/50 hover:shadow-amber-900/10 transition-all hover:-translate-y-1 relative overflow-hidden group cursor-pointer" (click)="scrollToLimpiezas()">
+              <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fcc419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></div>
+              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Limpiezas Pendientes</p>
+              <h3 class="text-3xl font-black text-white mb-4">{{ totalLimpiezasPendientes }}</h3>
+              <div class="text-amber-500 text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">Ver detalles <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
             </div>
-            <div class="bg-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-xl hover:border-[#0055FF]/30 transition-colors">
-              <div class="w-10 h-10 rounded-xl bg-[#2b1a33] flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b197fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Mensajes Nuevos</p><h3 class="text-3xl font-bold text-white mb-4">{{ totalMensajesNuevos }}</h3>
-              <button (click)="setAdminView('mensajes')" class="text-[#0055FF] text-sm font-semibold hover:underline">Ir a mensajes</button>
+            
+            <div class="bg-[#1A1A1A]/80 backdrop-blur-xl border border-[#333333] rounded-2xl p-6 shadow-xl hover:border-purple-500/50 hover:shadow-purple-900/10 transition-all hover:-translate-y-1 relative overflow-hidden group cursor-pointer" (click)="setAdminView('mensajes')">
+              <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b197fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+              <p class="text-[#a0a0a0] text-sm font-medium mb-1">Mensajes Nuevos</p>
+              <h3 class="text-3xl font-black text-white mb-4">{{ totalMensajesNuevos }}</h3>
+              <div class="text-purple-400 text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">Ir a mensajes <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
             </div>
           </div>
           <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
@@ -1040,7 +1112,13 @@
         </div>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="m9 18 6-6-6-6"/></svg>
       </div>
-      <div *ngIf="checkinsHoy.length === 0" class="text-center py-10 text-[#a0a0a0] text-sm">No hay actividad reciente</div>
+      <div *ngIf="checkinsHoy.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+        <div class="w-16 h-16 rounded-full bg-[#1A1A1A] border border-[#333333] flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h4 class="text-white font-bold text-base mb-1">Sin movimientos hoy</h4>
+        <p class="text-[#a0a0a0] text-sm max-w-[200px]">No tienes Check-ins ni Check-outs programados para hoy.</p>
+      </div>
     </div>
   </div>
 
@@ -1069,7 +1147,13 @@
           {{ tarea.completada ? 'Reabrir tarea' : 'Marcar como completada' }}
         </button>
       </div>
-      <div *ngIf="tareasLimpieza.length === 0" class="text-center py-10 text-[#a0a0a0] text-sm">No hay tareas de limpieza pendientes</div>
+      <div *ngIf="tareasLimpieza.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+        <div class="w-16 h-16 rounded-full bg-amber-500/5 border border-amber-500/20 flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fcc419" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        </div>
+        <h4 class="text-white font-bold text-base mb-1">Todo limpio</h4>
+        <p class="text-[#a0a0a0] text-sm max-w-[200px]">No hay tareas de limpieza pendientes por ahora.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -1192,7 +1276,7 @@
                 </div>
               </div>
               <div class="flex-1 overflow-y-auto min-h-0 max-h-40 lg:max-h-none scrollbar-hide">
-                <button *ngFor="let contacto of adminContactosFiltrados" (click)="adminSeleccionarContacto(contacto)" [ngClass]="{'bg-[#2a2a2a]': adminContactoActivo.id === contacto.id}" class="w-full p-4 flex items-start gap-3 hover:bg-[#2a2a2a]/50 transition-colors text-left border-b border-[#333333]/50 last:border-0">
+                <button *ngFor="let contacto of adminContactosFiltrados" (click)="adminSeleccionarContacto(contacto)" [ngClass]="{'bg-[#2a2a2a]': adminContactoActivo?.id === contacto.id}" class="w-full p-4 flex items-start gap-3 hover:bg-[#2a2a2a]/50 transition-colors text-left border-b border-[#333333]/50 last:border-0">
                   <div class="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <img [src]="contacto.imagen" [alt]="contacto.propiedad" class="w-full h-full object-cover">
                   </div>
@@ -1210,34 +1294,45 @@
             </div>
 
             <div class="flex-1 flex flex-col min-h-0 bg-[#121212]">
-              <div class="p-4 border-b border-[#333333] flex items-center gap-4 flex-shrink-0 bg-[#1A1A1A]">
-                <div class="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                  <img [src]="adminContactoActivo.imagen" [alt]="adminContactoActivo.propiedad" class="w-full h-full object-cover">
-                </div>
-                <div>
-                  <h3 class="font-bold text-white">{{ adminContactoActivo.nombre }}</h3>
-                  <p class="text-sm text-[#0055FF] font-medium">{{ adminContactoActivo.propiedad }}</p>
-                </div>
-              </div>
-
-              <div class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
-                <div *ngFor="let msg of adminContactoActivo.chat" class="flex" [ngClass]="msg.enviado ? 'justify-end' : 'justify-start'">
-                  <div class="max-w-[75%] px-5 py-3 rounded-2xl shadow-md" [ngClass]="msg.enviado ? 'bg-[#0055FF] text-white rounded-br-sm' : 'bg-[#2a2a2a] text-white rounded-bl-sm border border-[#333333]'">
-                    <p class="text-[15px] leading-relaxed">{{ msg.texto }}</p>
-                    <p class="text-[10px] mt-1.5 opacity-70" [ngClass]="msg.enviado ? 'text-right' : 'text-left'">{{ msg.hora }}</p>
+              <ng-container *ngIf="adminContactoActivo; else sinAdminChatSeleccionado">
+                <div class="p-4 border-b border-[#333333] flex items-center gap-4 flex-shrink-0 bg-[#1A1A1A]">
+                  <div class="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                    <img [src]="adminContactoActivo.imagen" [alt]="adminContactoActivo.propiedad" class="w-full h-full object-cover">
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-white">{{ adminContactoActivo.nombre }}</h3>
+                    <p class="text-sm text-[#0055FF] font-medium">{{ adminContactoActivo.propiedad }}</p>
                   </div>
                 </div>
-              </div>
 
-              <div class="p-4 border-t border-[#333333] flex-shrink-0 bg-[#1A1A1A]">
-                <div class="flex gap-3">
-                  <input type="text" [(ngModel)]="adminMensajeInput" (keydown.enter)="adminEnviarMensaje()" placeholder="Escribe un mensaje..." class="flex-1 px-5 py-3.5 bg-[#121212] border border-[#333333] rounded-xl text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#0055FF] transition-colors text-sm">
-                  <button (click)="adminEnviarMensaje()" class="px-6 py-3.5 bg-[#0055FF] text-white rounded-xl font-bold hover:bg-[#0044CC] transition-colors flex items-center gap-2 shadow-lg shadow-blue-900/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                    <span class="hidden sm:inline">Enviar</span>
-                  </button>
+                <div class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+                  <div *ngFor="let msg of adminContactoActivo.chat" class="flex" [ngClass]="msg.enviado ? 'justify-end' : 'justify-start'">
+                    <div class="max-w-[75%] px-5 py-3 rounded-2xl shadow-md" [ngClass]="msg.enviado ? 'bg-[#0055FF] text-white rounded-br-sm' : 'bg-[#2a2a2a] text-white rounded-bl-sm border border-[#333333]'">
+                      <p class="text-[15px] leading-relaxed">{{ msg.texto }}</p>
+                      <p class="text-[10px] mt-1.5 opacity-70" [ngClass]="msg.enviado ? 'text-right' : 'text-left'">{{ msg.hora }}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+
+                <div class="p-4 border-t border-[#333333] flex-shrink-0 bg-[#1A1A1A]">
+                  <div class="flex gap-3">
+                    <input type="text" [(ngModel)]="adminMensajeInput" (keydown.enter)="adminEnviarMensaje()" placeholder="Escribe un mensaje..." class="flex-1 px-5 py-3.5 bg-[#121212] border border-[#333333] rounded-xl text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#0055FF] transition-colors text-sm">
+                    <button (click)="adminEnviarMensaje()" class="px-6 py-3.5 bg-[#0055FF] text-white rounded-xl font-bold hover:bg-[#0044CC] transition-colors flex items-center gap-2 shadow-lg shadow-blue-900/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                      <span class="hidden sm:inline">Enviar</span>
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-template #sinAdminChatSeleccionado>
+                <div class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[#1A1A1A] h-full">
+                  <div class="w-20 h-20 bg-[#2a2a2a] rounded-full flex items-center justify-center mb-6 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-[#a0a0a0]"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                  </div>
+                  <h2 class="text-xl font-bold text-white mb-2">Tus Mensajes</h2>
+                  <p class="text-[#a0a0a0] max-w-sm mx-auto">Selecciona una conversación del panel izquierdo para ver los mensajes o interactuar con tus huéspedes.</p>
+                </div>
+              </ng-template>
             </div>
           </div>
 
@@ -1374,7 +1469,54 @@
           </div>
         </div>
       </div>
+
     </main>
   </div>
 
+  <!-- NUEVO MODAL: CANCELACIÓN DE RESERVA -->
+  <div *ngIf="isCancelModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="cerrarModalCancelacion()"></div>
+    <div class="relative bg-[#1A1A1A] border border-[#333333] rounded-3xl w-full max-w-md shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+      
+      <div class="p-8 pb-6 flex flex-col items-center text-center">
+        <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        
+        <h2 class="text-2xl font-bold text-white mb-2">Cancelar Reserva</h2>
+        <p class="text-[#a0a0a0] mb-6">Estás a punto de cancelar tu viaje en <span class="text-white font-medium">{{reservaToCancel?.nombrePropiedad}}</span>.</p>
+        
+        <!-- Política de Reembolso Card -->
+        <div class="w-full bg-[#121212] border border-[#333333] rounded-2xl p-5 mb-2 text-left">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-3">Política de Reembolso</h3>
+          
+          <div *ngIf="cancelInfo?.isFree" class="flex gap-4">
+            <div class="mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <p class="text-white font-medium">Reembolso Total Garantizado</p>
+              <p class="text-sm text-[#a0a0a0] mt-1">Estás dentro de las 24 horas de gracia desde que hiciste la reserva. Se te devolverá el 100% de tu dinero a tu método de pago original.</p>
+            </div>
+          </div>
+          
+          <div *ngIf="!cancelInfo?.isFree" class="flex gap-4">
+            <div class="mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <p class="text-red-400 font-medium">Penalidad Aplicada</p>
+              <p class="text-sm text-[#a0a0a0] mt-1">Han pasado más de 24 horas desde que realizaste la reserva ({{cancelInfo?.hoursPassed | number:'1.0-0'}} horas). Según nuestra política, se aplicará una penalidad del 100%.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4 p-6 border-t border-[#333333] bg-[#1A1A1A]">
+        <button (click)="cerrarModalCancelacion()" class="py-3.5 bg-[#2a2a2a] text-white rounded-xl font-bold hover:bg-[#333333] transition-all text-sm">Mantener Reserva</button>
+        <button (click)="confirmarCancelacion()" class="py-3.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-xl font-bold transition-all text-sm shadow-[0_0_15px_rgba(248,113,113,0.1)]">Sí, Cancelar</button>
+      </div>
+      
+    </div>
+  </div>
 </div>
