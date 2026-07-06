@@ -11,4 +11,9 @@ func PropertyRoutes(app *fiber.App) {
 	
 	api.Get("/properties", controllers.GetProperties)
 	api.Post("/seed", controllers.SeedProperties)
+
+	// Reviews
+	api.Post("/properties/:id/reviews", controllers.CreateReview)
+	api.Get("/properties/:id/reviews", controllers.GetReviewsByProperty)
+	api.Get("/reviews", controllers.GetAllReviews)
 }

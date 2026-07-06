@@ -7,7 +7,7 @@ import (
 type User struct {
 	gorm.Model
 	Nombre       string `json:"nombre"`
-	Email        string `json:"email" gorm:"uniqueIndex"`
+	Email        string `json:"email" gorm:"type:varchar(100);uniqueIndex"`
 	Telefono     string `json:"telefono"`
 	PasswordHash string `json:"-"`
 	GoogleID     string `json:"google_id"`

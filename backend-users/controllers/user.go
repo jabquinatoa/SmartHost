@@ -5,6 +5,7 @@ import (
 	"smarthost-users/db"
 	"smarthost-users/models"
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func SeedUsers(c *fiber.Ctx) error {
@@ -14,17 +15,21 @@ func SeedUsers(c *fiber.Ctx) error {
 	db.DB.Exec("DELETE FROM payment_methods")
 	db.DB.Exec("DELETE FROM users")
 
+	// Hash passwords for seeds
+	adminHash, _ := bcrypt.GenerateFromPassword([]byte("Jota6002"), bcrypt.DefaultCost)
+	guestHash, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+
 	// Seed Users
-	host := models.User{Nombre: "Admin Host", Email: "admin@smarthost.com", Telefono: "0999999999", Rol: "HOST"}
-	guest1 := models.User{Nombre: "Juan Perez", Email: "juan@example.com", Telefono: "0991111111", Rol: "GUEST"}
-	guest2 := models.User{Nombre: "Maria Lopez", Email: "maria@example.com", Telefono: "0992222222", Rol: "GUEST"}
+	host := models.User{Nombre: "José Andrés", Email: "jab.quinatoa@yavirac.edu.ec", Telefono: "0999999999", Rol: "HOST", PasswordHash: string(adminHash)}
+	guest1 := models.User{Nombre: "Juan Perez", Email: "juan@example.com", Telefono: "0991111111", Rol: "GUEST", PasswordHash: string(guestHash)}
+	guest2 := models.User{Nombre: "Maria Lopez", Email: "maria@example.com", Telefono: "0992222222", Rol: "GUEST", PasswordHash: string(guestHash)}
 	db.DB.Create(&host)
 	db.DB.Create(&guest1)
 	db.DB.Create(&guest2)
 
 	// Seed Payment Methods
-	payment1 := models.PaymentMethod{UsuarioID: host.ID, Tipo: "Tarjeta de Crédito", UltimosDigitos: "4321", Proveedor: "Visa", EsPrincipal: true}
-	payment2 := models.PaymentMethod{UsuarioID: guest1.ID, Tipo: "Tarjeta de Débito", UltimosDigitos: "1111", Proveedor: "Mastercard", EsPrincipal: true}
+	payment1 := models.PaymentMethod{UsuarioID: host.ID, Tipo: "Transferencia Bancaria", Banco: "Banco Pichincha", Cuenta: "2200113344", Titular: "Smart Host S.A.", Identificacion: "1790000000001"}
+	payment2 := models.PaymentMethod{UsuarioID: host.ID, Tipo: "DeUna", Celular: "0999999999", Titular: "Smart Host S.A."}
 	db.DB.Create(&payment1)
 	db.DB.Create(&payment2)
 

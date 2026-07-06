@@ -1,11 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { Property, Reserva, TareaLimpieza, MetodoPago } from '../models/property.model';
 import { ChatMessage, Contacto } from '../models/chat.model';
 import { ApiService } from '../services/api.service';
-
 
 @Component({
   selector: 'app-catalogo',
@@ -16,6 +15,7 @@ import { ApiService } from '../services/api.service';
 export class CatalogoComponent implements OnInit {
 
   private apiService = inject(ApiService);
+  private cdr = inject(ChangeDetectorRef);
 
   // --- SISTEMA AUTOMÁTICO DE NOTIFICACIONES ANIMADAS ---
   // Variables del Toast Animado
@@ -78,10 +78,16 @@ export class CatalogoComponent implements OnInit {
   authEmail = '';
   authPassword = '';
   authName = '';
+  authPhone = '';
   isLoggedIn = false;
+  userId = 0;
   userName = '';
   userEmail = '';
   userPhone = '';
+  userRole = 'GUEST';
+  
+  isHostRequestModalOpen = false;
+  
   contactMessage = '';
 
   // Chat del lado VIAJERO (vista 'mensajes') — NUEVO
@@ -199,10 +205,7 @@ export class CatalogoComponent implements OnInit {
     this.isAdminSearchOpen = false;
   }
 
-  adminNotificaciones = [
-    { id: 1, titulo: "Nueva actualización", mensaje: "¡Bienvenido a tu panel renovado de Smart Host!", tiempo: "Hace 5 min", leida: false },
-    { id: 2, titulo: "Mensaje de Pedro Ruiz", mensaje: "Perfecto, nos vemos mañana", tiempo: "Hace 1 hora", leida: false }
-  ];
+  adminNotificaciones: any[] = [];
 
   get notificacionesNoLeidas() { return this.adminNotificaciones.filter(n => !n.leida).length; }
   marcarTodasLeidas() { this.adminNotificaciones.forEach(n => n.leida = true); this.saveData(); }
@@ -222,10 +225,12 @@ export class CatalogoComponent implements OnInit {
   // con el primer contacto de la lista, igual que hacía loadData() al cargar datos guardados.
   adminContactoActivo: Contacto | null = null;
 
-  adminResenas: any[] = [
-    { id: 1, nombre: "Laura Mendez", propiedad: "Loft Moderno Parque La Carolina", rating: 5, texto: "Excelente ubicacion y muy limpio. Volveria sin duda!", fecha: "hace 2 dias" },
-    { id: 2, nombre: "Roberto Diaz", propiedad: "Suite Ejecutiva con Vista al Pichincha", rating: 4, texto: "Muy comodo para viajes de trabajo. Solo falta mejor WiFi.", fecha: "hace 1 semana" }
-  ];
+  adminResenas: any[] = [];
+  
+  // === RESEÑAS FRONTEND ===
+  isReviewModalOpen = false;
+  reviewForm = { rating: 5, comment: '', propertyId: 0, guestName: '' };
+  propertyReviews: any[] = []; // Used to show reviews in property detail
 
   get adminContactosFiltrados() { return this.adminContactos.filter(c => c.nombre.toLowerCase().includes(this.adminMensajesBusqueda.toLowerCase())); }
   get ocupacionPorcentajeGeneral() { return 75; }
@@ -401,6 +406,7 @@ export class CatalogoComponent implements OnInit {
   async ngOnInit() {
     await this.fetchDataFromApi();
     this.loadData();
+    this.cdr.detectChanges();
   }
 
   private async fetchDataFromApi() {
@@ -434,8 +440,30 @@ export class CatalogoComponent implements OnInit {
         
         this.reservasBase = merged;
       }
-    } catch (e) {
 
+      const dbPagos = await this.apiService.getPagos();
+      if (dbPagos && dbPagos.length > 0) {
+        const mergedPagos = [...this.metodosPagoBase];
+        dbPagos.forEach(dbp => {
+          if (!mergedPagos.find(m => m.id === dbp.id)) mergedPagos.push(dbp);
+        });
+        this.metodosPago = mergedPagos;
+      }
+
+      const allReviews = await this.apiService.getAllReviews();
+      if (allReviews && allReviews.length > 0) {
+        this.adminResenas = allReviews.map(r => ({
+          id: r.ID || r.id,
+          nombre: r.guest_name,
+          propiedad: this.properties.find(p => p.id === r.propiedad_id)?.name || 'Propiedad Desconocida',
+          rating: r.rating,
+          texto: r.comment,
+          fecha: r.date
+        }));
+      }
+
+    } catch (e) {
+      console.error('Error fetching API data', e);
     }
   }
 
@@ -498,12 +526,16 @@ export class CatalogoComponent implements OnInit {
         if (parsed.userName) this.userName = parsed.userName;
         if (parsed.userEmail) this.userEmail = parsed.userEmail;
         if (parsed.userPhone) this.userPhone = parsed.userPhone;
+        if (parsed.userRole) this.userRole = parsed.userRole;
+        if (parsed.userId) this.userId = parsed.userId;
         if (parsed.adminNotificaciones) this.adminNotificaciones = parsed.adminNotificaciones;
 
         // Migración defensiva: completa contactos viejos y conserva las
         // simulaciones base cuando localStorage trae una lista incompleta.
         if (parsed.adminContactos) {
-          this.adminContactos = this.mezclarContactosGuardados(parsed.adminContactos).filter(c => c.id > 100);
+          const loaded = this.mezclarContactosGuardados(parsed.adminContactos);
+          // Eliminar los chats ficticios antiguos que se quedaron guardados
+          this.adminContactos = loaded.filter(c => c.chat.length > 0 && c.chat[0].id > 1000);
         }
         if (this.adminContactos.length > 0) this.adminContactoActivo = this.adminContactos[0];
       } catch (e) { console.error("Error al cargar datos locales", e); }
@@ -522,6 +554,8 @@ export class CatalogoComponent implements OnInit {
       userName: this.userName,
       userEmail: this.userEmail,
       userPhone: this.userPhone,
+      userRole: this.userRole,
+      userId: this.userId,
       adminNotificaciones: this.adminNotificaciones
     };
     localStorage.setItem('smartHostDB', JSON.stringify(dataToSave));
@@ -765,19 +799,21 @@ export class CatalogoComponent implements OnInit {
   }
 
   showToast(mensaje: string) {
-    // El secreto aquí es usar 'window.' para forzar el temporizador del navegador
-    if (this.toastTimeout) { window.clearTimeout(this.toastTimeout); }
-    if (this.leaveTimeout) { window.clearTimeout(this.leaveTimeout); }
+    if (this.toastTimeout) { clearTimeout(this.toastTimeout); }
+    if (this.leaveTimeout) { clearTimeout(this.leaveTimeout); }
 
     this.toastMsg = mensaje;
     this.toastState = 'visible';
+    this.cdr.detectChanges();
 
-    this.toastTimeout = window.setTimeout(() => {
+    this.toastTimeout = setTimeout(() => {
       this.toastState = 'leaving';
+      this.cdr.detectChanges();
 
-      this.leaveTimeout = window.setTimeout(() => {
+      this.leaveTimeout = setTimeout(() => {
         this.toastMsg = null;
         this.toastState = null;
+        this.cdr.detectChanges();
       }, 300);
     }, 3000);
   }
@@ -821,10 +857,13 @@ export class CatalogoComponent implements OnInit {
     this.saveData();
   }
 
-  handlePropertyClick(property: Property) {
+  async handlePropertyClick(property: Property) {
     this.selectedProperty = property;
     this.activeView = 'detalle';
     window.scrollTo(0, 0);
+    
+    // Load real reviews from DB
+    this.propertyReviews = await this.apiService.getReviews(property.id);
   }
 
   handleBackToCatalog() {
@@ -836,7 +875,7 @@ export class CatalogoComponent implements OnInit {
 
   openAuthModal(mode: 'login' | 'register') { this.authMode = mode; this.isAuthModalOpen = true; }
 
-  handleAuth() {
+  async handleAuth() {
     if (this.authMode === 'register') {
       if (!this.authName || !this.authEmail || !this.authPassword) {
         this.showToast('Por favor completa todos los campos.'); return;
@@ -847,6 +886,15 @@ export class CatalogoComponent implements OnInit {
       if (this.authPassword.length < 6) {
         this.showToast('La contraseña debe tener al menos 6 caracteres.'); return;
       }
+
+      const res = await this.apiService.register(this.authName, this.authEmail, this.authPhone, this.authPassword);
+      if (res && res.user) {
+        this.showToast('Cuenta creada con éxito. Iniciando sesión...');
+        this.authMode = 'login';
+        await this.handleAuth(); // Auto-login
+      } else {
+        this.showToast('Error al registrar. Revisa los datos (quizás el email ya existe).');
+      }
     } else {
       if (!this.authEmail || !this.authPassword) {
         this.showToast('Ingresa tus credenciales para continuar.'); return;
@@ -854,15 +902,24 @@ export class CatalogoComponent implements OnInit {
       if (!this.authEmail.includes('@')) {
         this.showToast('Ingresa un correo electrónico válido.'); return;
       }
-    }
 
-    this.isLoggedIn = true;
-    this.userName = this.authMode === 'login' ? (this.authEmail.split('@')[0] || 'José') : this.authName;
-    this.userEmail = this.authEmail;
-    this.showToast(this.authMode === 'login' ? 'Sesión iniciada con éxito' : 'Cuenta creada con éxito');
-    this.isAuthModalOpen = false;
-    this.authEmail = ''; this.authPassword = ''; this.authName = '';
-    this.saveData();
+      const res = await this.apiService.login(this.authEmail, this.authPassword);
+      if (res && res.token) {
+        localStorage.setItem('token', res.token);
+        this.isLoggedIn = true;
+        this.userName = res.user.nombre;
+        this.userEmail = res.user.email;
+        this.userRole = res.user.rol;
+        this.userId = res.user.id;
+        
+        this.showToast('Sesión iniciada con éxito');
+        this.isAuthModalOpen = false;
+        this.authEmail = ''; this.authPassword = ''; this.authName = ''; this.authPhone = '';
+        this.saveData();
+      } else {
+        this.showToast('Credenciales incorrectas');
+      }
+    }
   }
 
   logout() {
@@ -870,12 +927,29 @@ export class CatalogoComponent implements OnInit {
     this.userName = '';
     this.userEmail = '';
     this.userPhone = '';
+    this.userId = 0;
+    this.userRole = 'GUEST';
     this.favorites = [];
     this.contactoClienteActivo = null;
     this.isUserMenuOpen = false;
     this.activeView = 'catalogo';
-    this.showToast('Sesión cerrada exitosamente');
+    localStorage.removeItem('token');
     this.saveData();
+    this.showToast('Sesión cerrada');
+  }
+
+  solicitarSerAnfitrion() {
+    this.showToast('Solicitud enviada a los administradores. En espera de aprobación.');
+    this.isHostRequestModalOpen = false;
+  }
+
+  ingresarModoAnfitrion() {
+    this.isUserMenuOpen = false;
+    if (this.userRole === 'HOST' || this.userRole === 'ADMIN') {
+      this.activeView = 'admin';
+    } else {
+      this.isHostRequestModalOpen = true;
+    }
   }
 
   goToConfiguracion() {
@@ -926,7 +1000,7 @@ export class CatalogoComponent implements OnInit {
     this.editingPagoId = null;
   }
 
-  savePago() {
+  async savePago() {
     if (!this.pagoForm.titular) {
       this.showToast('Por favor, ingresa el titular.');
       return;
@@ -941,24 +1015,29 @@ export class CatalogoComponent implements OnInit {
     }
 
     if (this.editingPagoId) {
-      const index = this.metodosPago.findIndex(p => p.id === this.editingPagoId);
-      if (index !== -1) {
-        this.metodosPago[index] = { ...this.metodosPago[index], ...this.pagoForm } as MetodoPago;
+      const res = await this.apiService.updatePago({ ...this.pagoForm, id: this.editingPagoId } as MetodoPago);
+      if (res) {
+        this.metodosPago = this.metodosPago.map(p => 
+          p.id === this.editingPagoId ? { ...p, ...this.pagoForm } as MetodoPago : p
+        );
+        this.showToast('Método de pago actualizado');
       }
-      this.showToast('Método de pago actualizado');
     } else {
-      const newId = this.metodosPago.length > 0 ? Math.max(...this.metodosPago.map(p => p.id)) + 1 : 1;
-      this.metodosPago.push({ ...this.pagoForm, id: newId } as MetodoPago);
-      this.showToast('Método de pago agregado');
+      const saved = await this.apiService.createPago(this.pagoForm as MetodoPago);
+      if (saved) {
+        this.metodosPago = [...this.metodosPago, saved];
+        this.showToast('Método de pago agregado');
+      }
     }
-    this.saveData();
     this.closePagoForm();
   }
 
-  deletePago(id: number) {
-    this.metodosPago = this.metodosPago.filter(p => p.id !== id);
-    this.showToast('Método de pago eliminado');
-    this.saveData();
+  async deletePago(id: number) {
+    const res = await this.apiService.deletePago(id);
+    if (res) {
+      this.metodosPago = this.metodosPago.filter(p => p.id !== id);
+      this.showToast('Método de pago eliminado');
+    }
   }
 
   get dynamicNights() {
@@ -974,17 +1053,15 @@ export class CatalogoComponent implements OnInit {
     return !d ? 'Añadir fecha' : d.toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  handleReservation() {
+  async handleReservation() {
     if (!this.isLoggedIn) { this.openAuthModal('login'); this.showToast('Inicia sesión para solicitar una reserva'); return; }
     if (!this.selDateIn || !this.selDateOut || !this.selectedProperty) { this.showToast('Por favor selecciona las fechas de viaje'); return; }
     
-    // Guardamos referencias locales ya validadas (evita perder el narrowing de TS)
     const property = this.selectedProperty;
     const checkIn = this.selDateIn;
     const checkOut = this.selDateOut;
 
-    // 1. Guardar la reserva para la vista del viajero
-    this.reservasBase.push({
+    const reservaData = {
       id: Date.now(),
       propiedadId: property.id,
       nombrePropiedad: property.name,
@@ -994,23 +1071,28 @@ export class CatalogoComponent implements OnInit {
       huesped: this.userName || 'Viajero',
       fechaCheckIn: checkIn,
       fechaCheckOut: checkOut,
-      estado: 'Pendiente' // Estado en "Pendiente" para simular pago
-    });
+      estado: 'Reserva con éxito' as any
+    };
 
-    // 2. Bloquear los días en el calendario del administrador
+    // Actualizamos estado local INMEDIATAMENTE para evitar doble click
+    this.reservasBase.push(reservaData);
     this.bloquearFechasReserva(property, checkIn, checkOut);
     property.estado = 'Ocupado';
 
-    // 3. Crear la notificación
     this.adminNotificaciones.unshift({
       id: Date.now(),
-      titulo: '¡Nueva Reserva Pendiente!',
-      mensaje: `Pago pendiente para ${property.name}`,
+      titulo: '¡Nueva Reserva Recibida!',
+      mensaje: `El huésped ${this.userName || 'Viajero'} ha reservado ${property.name}`,
       tiempo: 'ahora',
       leida: false
     });
 
-    // 4. Construir las instrucciones de pago basadas en el método configurado
+    // Crear o continuar el chat automático
+    const contacto = this.obtenerOCrearContacto(property);
+    const horaActual = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+    const mensajeReserva = `Hola, acabo de reservar ${property.name} del ${this.formatIsoDate(checkIn)} al ${this.formatIsoDate(checkOut)}.`;
+
+    // 4. Construir las instrucciones de pago
     let instruccionesPago = "No hay métodos de pago configurados.";
     if (this.metodosPago.length > 0) {
       const p = this.metodosPago[0];
@@ -1020,36 +1102,31 @@ export class CatalogoComponent implements OnInit {
         instruccionesPago = `${p.banco}: Cuenta ${p.cuenta} a nombre de ${p.titular} (CI/RUC: ${p.identificacion || 'N/A'}).`;
       }
     }
-
-    // 5. Crear o continuar el chat con contexto de la reserva.
-    const contacto = this.obtenerOCrearContacto(property);
-    const horaActual = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
-    const mensajeReserva = `Hola, solicité una reserva del ${this.formatIsoDate(checkIn)} al ${this.formatIsoDate(checkOut)} para ${property.name}.`;
-    
-    // Mensaje automático del anfitrión solicitando el pago
-    const mensajeCobro = `¡Hola! Gracias por solicitar reservar ${property.name} del ${this.formatIsoDate(checkIn)} al ${this.formatIsoDate(checkOut)}. Para confirmar tu reserva, por favor realiza una transferencia o pago por DeUna por el valor de $${this.total} a los siguientes datos:\n\n${instruccionesPago}\n\nPor favor, envíame el comprobante por este medio.`;
+    const mensajeCobro = `¡Hola! Gracias por reservar. Para confirmar tu reserva, por favor realiza una transferencia o pago por DeUna por el valor de $${this.total} a los siguientes datos:\n\n${instruccionesPago}\n\nPor favor, envíame el comprobante por este medio.`;
 
     contacto.fechas = this.formattedSearchDates;
     contacto.chat.push({ id: contacto.chat.length + 1, texto: mensajeReserva, enviado: false, hora: horaActual });
     contacto.chat.push({ id: contacto.chat.length + 2, texto: mensajeCobro, enviado: true, hora: horaActual });
     contacto.ultimo = "Instrucciones de pago enviadas.";
     contacto.tiempo = "ahora";
-    contacto.noLeidosViajero = (contacto.noLeidosViajero || 0) + 1;
+    contacto.noLeidos = (contacto.noLeidos || 0) + 1; // Para el admin
     this.moverContactoArriba(contacto);
-
-    // Guardar cambios
-    this.saveData();
 
     // Limpiar UI y Redirigir a Mensajes
     this.isDetailCalendarOpen = false;
     this.isDetailGuestOpen = false;
-    this.showToast('Reserva solicitada. Por favor, procede con el pago.');
+    this.showToast('¡Reserva confirmada con éxito!');
     
-    // Redirigimos al chat para procesar el pago
     this.contactoClienteActivo = contacto;
     this.activeView = 'mensajes';
     this.clearSearchDates();
     window.scrollTo(0, 0);
+
+    // Mandar petición al backend y guardar asíncronamente
+    this.apiService.saveReservation(reservaData as Reserva).then(saved => {
+      if (!saved) this.showToast('Nota: Hubo un problema sincronizando la reserva en la nube.');
+    });
+    this.saveData();
   }
 
   clearAllFilters() { this.activeFilter = 'Todos'; this.selectedDestino = ''; this.priceMin = ''; this.priceMax = ''; this.selectedAmenities = []; this.adults = 2; this.children = 0; this.clearSearchDates(); this.showToast('Filtros limpiados'); }
@@ -1107,6 +1184,48 @@ export class CatalogoComponent implements OnInit {
     return prop ? prop.image : '';
   }
   goToMisViajes() { this.isUserMenuOpen = false; this.activeView = 'mis-viajes'; window.scrollTo(0, 0); }
+
+  // === RESEÑAS FRONTEND ===
+  hasBooked(propertyId: number): boolean {
+    return this.misViajesList.some(v => v.propiedadId === propertyId && (v.estado === 'Check-out' || v.estado === 'Check-in'));
+  }
+
+  openReviewForm(propertyId: number) {
+    this.reviewForm = {
+      rating: 5,
+      comment: '',
+      propertyId: propertyId,
+      guestName: this.userName
+
+    };
+    this.isReviewModalOpen = true;
+  }
+
+  closeReviewForm() {
+    this.isReviewModalOpen = false;
+  }
+
+  async submitReview() {
+    if (this.reviewForm.rating < 1 || this.reviewForm.rating > 5) {
+      this.showToast('Por favor, selecciona una puntuación válida');
+      return;
+    }
+    
+    const success = await this.apiService.createReview(this.reviewForm.propertyId, {
+      guest_name: this.reviewForm.guestName,
+      rating: this.reviewForm.rating,
+      comment: this.reviewForm.comment,
+      propiedad_id: this.reviewForm.propertyId
+    });
+
+    if (success) {
+      this.showToast('¡Reseña enviada con éxito!');
+      this.closeReviewForm();
+      // Opcional: Recargar reseñas si estuvieramos viéndolas
+    } else {
+      this.showToast('Error al enviar reseña. Inténtalo más tarde.');
+    }
+  }
 
   abrirModalCancelacion(reserva: Reserva) {
     this.reservaToCancel = reserva;

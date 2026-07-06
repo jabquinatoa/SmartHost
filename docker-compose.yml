@@ -1,16 +1,26 @@
 version: '3.8'
 
 services:
-  db:
+  postgres-db:
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: secretpassword
-      POSTGRES_DB: smarthost
+      POSTGRES_DB: smarthost_core
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata-core:/var/lib/postgresql/data
+
+  mysql-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: secretpassword
+      MYSQL_DATABASE: smarthost_users
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysqldata-users:/var/lib/mysql
 
   users-service:
     build:
@@ -19,13 +29,13 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - DB_HOST=db
+      - DB_HOST=mysql-db
       - DB_USER=root
       - DB_PASSWORD=secretpassword
-      - DB_NAME=smarthost
-      - DB_PORT=5432
+      - DB_NAME=smarthost_users
+      - DB_PORT=3306
     depends_on:
-      - db
+      - mysql-db
     volumes:
       - ./backend-users:/app
 
@@ -36,13 +46,13 @@ services:
     ports:
       - "3002:3002"
     environment:
-      - DB_HOST=db
+      - DB_HOST=postgres-db
       - DB_USER=root
       - DB_PASSWORD=secretpassword
-      - DB_NAME=smarthost
+      - DB_NAME=smarthost_core
       - DB_PORT=5432
     depends_on:
-      - db
+      - postgres-db
     volumes:
       - ./backend-core:/app
 
@@ -51,7 +61,9 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      - postgres-db
+      - mysql-db
 
 volumes:
-  pgdata:
+  pgdata-core:
+  mysqldata-users:

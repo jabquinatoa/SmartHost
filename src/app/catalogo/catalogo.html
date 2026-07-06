@@ -118,7 +118,7 @@
             <button (click)="openAuthModal('login')" class="px-5 py-2.5 border border-[#333333] text-white rounded-full hover:bg-[#2a2a2a] transition-all font-medium text-sm">Iniciar Sesión</button>
           </div>
           <div *ngIf="isLoggedIn" class="flex items-center gap-3 lg:gap-4 relative">
-            <button (click)="goToAdminPanel()" class="hidden lg:flex items-center gap-2 text-sm font-semibold text-white bg-[#121212] border border-[#333333] hover:border-[#0055FF] hover:bg-[#1a1a1a] px-4 py-2.5 rounded-full transition-all flex-shrink-0 whitespace-nowrap">
+            <button (click)="ingresarModoAnfitrion()" class="hidden lg:flex items-center gap-2 text-sm font-semibold text-white bg-[#121212] border border-[#333333] hover:border-[#0055FF] hover:bg-[#1a1a1a] px-4 py-2.5 rounded-full transition-all flex-shrink-0 whitespace-nowrap">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#0055FF]"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Modo Anfitrión
             </button>
             <div (click)="isUserMenuOpen = !isUserMenuOpen" class="flex items-center gap-2 cursor-pointer hover:bg-[#2a2a2a] p-1.5 pr-3 lg:pr-4 rounded-full border border-[#333333] transition-colors select-none bg-[#121212] flex-shrink-0">
@@ -135,7 +135,7 @@
                </button>
                <button (click)="goToFavoritos()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium">Favoritos</button>
                <hr class="border-[#333333] my-2">
-               <button (click)="goToAdminPanel()" class="w-full text-left px-5 py-3 text-sm text-[#0055FF] font-bold hover:bg-[#2a2a2a] lg:hidden transition-colors">Modo Anfitrión</button>
+               <button (click)="ingresarModoAnfitrion()" class="w-full text-left px-5 py-3 text-sm text-[#0055FF] font-bold hover:bg-[#2a2a2a] lg:hidden transition-colors">Modo Anfitrión</button>
                <button (click)="goToConfiguracion()" class="w-full text-left px-5 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors font-medium">Configuración de cuenta</button>
                <hr class="border-[#333333] my-2">
                <button (click)="logout()" class="w-full text-left px-5 py-3 text-sm text-[#ff4444] hover:bg-[#2a2a2a] transition-colors font-medium">Cerrar sesión</button>
@@ -219,7 +219,7 @@
             </div>
 
             <div *ngIf="filteredProperties.length > 0" [ngClass]="filteredProperties.length < 3 ? 'flex flex-wrap justify-center gap-8 w-full pt-4' : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10'">
-              <div *ngFor="let property of filteredProperties" class="group cursor-pointer transition-all duration-300 hover:-translate-y-2 w-full" [ngClass]="filteredProperties.length < 3 ? 'max-w-[400px]' : ''" (click)="handlePropertyClick(property)">
+              <div *ngFor="let property of filteredProperties; let i = index" [style.animation-delay]="(i * 0.1) + 's'" class="group cursor-pointer transition-all duration-300 hover:-translate-y-2 w-full animate-fade-in-up opacity-0" [ngClass]="filteredProperties.length < 3 ? 'max-w-[400px]' : ''" (click)="handlePropertyClick(property)">
                 <div class="relative aspect-[20/19] rounded-[2rem] overflow-hidden mb-4 shadow-lg group-hover:shadow-[0_0_20px_rgba(0,85,255,0.2)] transition-shadow bg-[#1A1A1A]">
                   <img [src]="property.image" [alt]="property.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div class="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 pointer-events-none">
@@ -281,7 +281,7 @@
             </div>
 
             <div *ngIf="favoritePropertiesList.length > 0" [ngClass]="favoritePropertiesList.length < 3 ? 'flex flex-wrap justify-center gap-8 w-full pt-4' : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10'">
-              <div *ngFor="let property of favoritePropertiesList" class="group cursor-pointer transition-all duration-300 hover:-translate-y-2 w-full" [ngClass]="favoritePropertiesList.length < 3 ? 'max-w-[400px]' : ''" (click)="handlePropertyClick(property)">
+              <div *ngFor="let property of favoritePropertiesList; let i = index" [style.animation-delay]="(i * 0.1) + 's'" class="group cursor-pointer transition-all duration-300 hover:-translate-y-2 w-full animate-fade-in-up opacity-0" [ngClass]="favoritePropertiesList.length < 3 ? 'max-w-[400px]' : ''" (click)="handlePropertyClick(property)">
                 <div class="relative aspect-[20/19] rounded-[2rem] overflow-hidden mb-4 shadow-lg bg-[#1A1A1A]">
                   <img [src]="property.image" [alt]="property.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div class="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 pointer-events-none">
@@ -325,7 +325,7 @@
             </div>
 
             <div *ngIf="misViajesList.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              <div *ngFor="let viaje of misViajesList" class="bg-[#1A1A1A] border border-[#333333] rounded-2xl overflow-hidden flex flex-col sm:flex-row shadow-lg hover:border-[#0055FF]/40 transition-colors">
+              <div *ngFor="let viaje of misViajesList; let i = index" [style.animation-delay]="(i * 0.1) + 's'" class="bg-[#1A1A1A] border border-[#333333] rounded-2xl overflow-hidden flex flex-col sm:flex-row shadow-lg hover:border-[#0055FF]/40 transition-colors animate-fade-in-up opacity-0">
                 <div class="w-full sm:w-40 h-48 sm:h-auto flex-shrink-0 relative">
                   <img [src]="getReservationImage(viaje)" class="absolute inset-0 w-full h-full object-cover" />
                 </div>
@@ -921,7 +921,7 @@
 
     <!-- TOAST NOTIFICACIONES ANIMADAS -->
     <div *ngIf="toastMsg" 
-         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] transition-all duration-300 ease-out pointer-events-none"
+         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] transition-all duration-300 ease-out pointer-events-none animate-fade-in-up"
          [class.opacity-0]="toastState === 'leaving'" [class.translate-y-4]="toastState === 'leaving'"
          [class.opacity-100]="toastState !== 'leaving'" [class.translate-y-0]="toastState !== 'leaving'">
       <div class="bg-[#0055FF] text-white px-6 py-3.5 rounded-full shadow-2xl shadow-blue-900/40 font-bold flex items-center gap-3 border border-white/10">
@@ -1230,27 +1230,49 @@
             <h3 class="text-lg font-semibold text-white mb-2">No se encontraron propiedades</h3>
             <p class="text-[#a0a0a0] text-sm text-center max-w-sm">No hay propiedades con el estado seleccionado. Intenta con otro filtro.</p>
           </div>
-          <div *ngIf="adminPropiedadesFiltradas.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div *ngFor="let propiedad of adminPropiedadesFiltradas" class="bg-[#1A1A1A] border border-[#333333] rounded-xl overflow-hidden hover:border-[#0055FF]/50 transition-all duration-300 group shadow-xl">
-              <div class="relative h-48 overflow-hidden">
-                <img [src]="propiedad.image" [alt]="propiedad.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div class="absolute top-3 right-3">
-                  <span class="px-3 py-1 rounded-full text-xs font-bold shadow-md"
+          <div *ngIf="adminPropiedadesFiltradas.length > 0" class="flex flex-col gap-4">
+            <div *ngFor="let propiedad of adminPropiedadesFiltradas; let i = index" [style.animation-delay]="(i * 0.1) + 's'" class="bg-[#1A1A1A] border border-[#333333] rounded-[1.5rem] p-4 flex flex-col md:flex-row items-center gap-6 hover:border-[#0055FF]/50 transition-all duration-300 group shadow-xl relative overflow-hidden animate-fade-in-up opacity-0">
+              <!-- Thumbnail -->
+              <div class="relative w-full md:w-48 h-32 flex-shrink-0 rounded-xl overflow-hidden shadow-inner bg-[#121212]">
+                <img [src]="propiedad.image" [alt]="propiedad.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100" />
+              </div>
+              
+              <!-- Info -->
+              <div class="flex-1 flex flex-col justify-center min-w-0">
+                <div class="flex items-center gap-3 mb-1">
+                  <h3 class="text-xl font-bold text-white truncate">{{ propiedad.name }}</h3>
+                  <span class="px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm"
                         [ngClass]="{
-                          'bg-emerald-500 text-white shadow-emerald-500/30': (propiedad.estado || 'Libre') === 'Libre',
-                          'bg-rose-500 text-white shadow-rose-500/30': propiedad.estado === 'Ocupado',
-                          'bg-amber-500 text-white shadow-amber-500/30': propiedad.estado === 'Mantenimiento'
+                          'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': (propiedad.estado || 'Libre') === 'Libre',
+                          'bg-rose-500/10 text-rose-400 border border-rose-500/20': propiedad.estado === 'Ocupado',
+                          'bg-amber-500/10 text-amber-400 border border-amber-500/20': propiedad.estado === 'Mantenimiento'
                         }">
                     {{ propiedad.estado || 'Libre' }}
                   </span>
                 </div>
+                <p class="text-[#a0a0a0] text-sm flex items-center gap-1.5 mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span class="truncate">{{ propiedad.location }}</span>
+                </p>
+                <div class="flex items-center flex-wrap gap-4 text-sm">
+                  <div class="flex items-center gap-1.5 text-white font-medium bg-[#2a2a2a] px-3 py-1.5 rounded-lg border border-[#333333]">
+                    <span class="text-[#0055FF] font-bold">${{ propiedad.price }}</span> <span class="text-[#a0a0a0] text-xs">/ noche</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-white font-medium bg-[#2a2a2a] px-3 py-1.5 rounded-lg border border-[#333333]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#0055FF" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    {{ propiedad.rating }}
+                  </div>
+                  <div class="flex items-center gap-1.5 text-[#a0a0a0] text-xs font-medium bg-[#2a2a2a] px-3 py-1.5 rounded-lg border border-[#333333]">
+                    {{ propiedad.type }}
+                  </div>
+                </div>
               </div>
-              <div class="p-4">
-                <h3 class="text-lg font-bold text-white mb-1">{{ propiedad.name }}</h3>
-                <p class="text-sm text-[#a0a0a0] mb-4">${{ propiedad.price }}/noche</p>
-                <button (click)="adminOpenEditarPropiedad(propiedad)" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2a2a2a] text-white rounded-lg font-medium hover:bg-[#0055FF] hover:text-white transition-all">
+              
+              <!-- Action -->
+              <div class="w-full md:w-auto flex-shrink-0 flex items-center mt-4 md:mt-0">
+                <button (click)="adminOpenEditarPropiedad(propiedad)" class="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3.5 bg-[#2a2a2a] border border-[#333333] text-white rounded-xl font-bold hover:bg-[#0055FF] hover:border-[#0055FF] hover:text-white transition-all shadow-lg hover:shadow-blue-900/30">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-                  Administrar Inmueble
+                  Administrar
                 </button>
               </div>
             </div>
@@ -1517,6 +1539,73 @@
         <button (click)="confirmarCancelacion()" class="py-3.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-xl font-bold transition-all text-sm shadow-[0_0_15px_rgba(248,113,113,0.1)]">Sí, Cancelar</button>
       </div>
       
+    </div>
+  </div>
+</div>
+
+<!-- HOST REQUEST MODAL -->
+<div *ngIf="isHostRequestModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div (click)="isHostRequestModalOpen = false" class="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in"></div>
+  <div class="bg-[#121212] border border-[#333333] rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md relative z-10 animate-in zoom-in-95 overflow-hidden">
+    <!-- Header -->
+    <div class="p-6 pb-4 border-b border-[#333333] flex justify-between items-center bg-[#1A1A1A]">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-[#0055FF]/20 flex items-center justify-center text-[#0055FF]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <h2 class="text-xl font-bold text-white">Convertirse en Anfitrión</h2>
+      </div>
+      <button (click)="isHostRequestModalOpen = false" class="p-2 text-[#a0a0a0] hover:text-white hover:bg-[#2a2a2a] rounded-full transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    
+    <!-- Body -->
+    <div class="p-6 bg-[#121212]">
+      <p class="text-[#a0a0a0] text-sm mb-6 leading-relaxed">
+        Actualmente tienes un rol de <strong>Huésped</strong>. Para acceder al panel de administración y publicar tus propias propiedades, necesitamos aprobar tu solicitud como Anfitrión.
+      </p>
+      
+      <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+        <div>
+          <label class="block text-xs font-bold text-[#a0a0a0] mb-2 uppercase tracking-wider">Nombre de Empresa o Anfitrión</label>
+          <input type="text" placeholder="Ej: Juan Pérez / Inmobiliaria XYZ" class="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333333] rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#0055FF] transition-colors">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-[#a0a0a0] mb-2 uppercase tracking-wider">Identificación / RUC</label>
+            <input type="text" placeholder="Ej: 1700000000" class="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333333] rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#0055FF] transition-colors">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#a0a0a0] mb-2 uppercase tracking-wider">Teléfono de Contacto</label>
+            <input type="text" placeholder="Ej: +593 999 999 999" class="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333333] rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#0055FF] transition-colors">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-[#a0a0a0] mb-2 uppercase tracking-wider">Propiedades Estimadas</label>
+            <select class="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333333] rounded-xl text-white focus:outline-none focus:border-[#0055FF] transition-colors appearance-none">
+              <option value="1-5">1 a 5 propiedades</option>
+              <option value="6-20">6 a 20 propiedades</option>
+              <option value="20+">Más de 20 propiedades</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#a0a0a0] mb-2 uppercase tracking-wider">Enlace de Referencia</label>
+            <input type="text" placeholder="Airbnb, Instagram, etc." class="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333333] rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#0055FF] transition-colors">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#a0a0a0] mb-2 uppercase tracking-wider">Breve Descripción</label>
+          <textarea rows="3" placeholder="¿Qué tipo de propiedades deseas alquilar? (Ubicación, tipo de turismo...)" class="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333333] rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#0055FF] transition-colors resize-none"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="p-6 border-t border-[#333333] bg-[#1A1A1A] flex gap-3">
+      <button (click)="isHostRequestModalOpen = false" class="flex-1 py-3 text-[#a0a0a0] font-bold hover:text-white hover:bg-[#2a2a2a] rounded-xl transition-all">Cancelar</button>
+      <button (click)="solicitarSerAnfitrion()" class="flex-1 py-3 bg-[#0055FF] hover:bg-[#0044cc] text-white font-bold rounded-xl shadow-[0_0_15px_rgba(0,85,255,0.3)] transition-all">Enviar Solicitud</button>
     </div>
   </div>
 </div>

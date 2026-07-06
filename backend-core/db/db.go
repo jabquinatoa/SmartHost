@@ -43,5 +43,6 @@ func Connect() {
 		&models.Property{},
 		&models.Reservation{},
 		&models.CleaningTask{},
+		&models.Review{},
 	)
 }
